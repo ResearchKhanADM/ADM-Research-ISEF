@@ -148,21 +148,35 @@ This is why the therapy is trametinib **plus** payload rather than either alone.
 
 Write the full system, then **nondimensionalize and adiabatically eliminate the fast variables** down to 5–6 slow states. Not simplification for its own sake: it is what makes continuation tractable, identifiability interpretable, and reachability computable.
 
+**Not every state exists in every topology.** The model is **composable**: a CORE right-hand side plus optional terms switched on by config flag. See §3.5 — this is what keeps the slow count at 6 despite the state list growing.
+
+### CORE states — present in every topology
+
 | Symbol | Meaning | Timescale |
 |---|---|---|
-| `P_n` | PTF1A, nuclear | slow |
-| `P_c` | PTF1A, cytoplasmic (ID3-bound) | fast → eliminate |
+| `P_n` | PTF1A, nuclear **free** (ID3-bound and complexed pools are derived) | slow |
 | `R` | RBPJL protein | **slow — the bottleneck** |
-| `E` | free E-protein (E47/HEB) | fast → eliminate |
-| `I` | ID3 | intermediate |
-| `C_L` | PTF1-L complex | fast → eliminate (quasi-equilibrium) |
-| `C_J` | PTF1-J complex | fast → eliminate |
-| `M` | slow chromatin state at **metaplasia** loci | **slow — the memory** |
+| `E_tot` | **total** E-protein (E47/HEB) — synthesis, degradation, and the `u₃=E47` input | **slow** |
+| `I` | ID3 | intermediate → leading QSS candidate at reduction |
+| `M` | slow self-reinforcing chromatin at **metaplasia** loci | **slow — the memory** |
 | `A` | acinar output (amylase / CPA1 proxy) | slow |
 | `S` | secretory cargo / capacity ratio | slow |
-| `W` | phospho-MEK pool / RAF→MEK activation drive | **fast — but PROTECTED FROM ELIMINATION, see §3.2** |
+| `W` | phospho-MEK pool / RAF→MEK activation drive | **fast — PROTECTED FROM ELIMINATION, §3.2** |
 
-**Eleven states, not ten.** `W` was added because the withdrawal-asymmetry prediction in §1.2 is not derivable without it (proof in §1.2).
+### VARIANT states — exist only in the topologies that test them
+
+| Symbol | Meaning | Present in |
+|---|---|---|
+| `MIST1` | secretory capacity arm (BHLHA15) | **T5 only** |
+| `NR5A2` | enhancer co-activator (or acinar-output co-activator — competing variants) | NR5A2 topology variants only |
+
+### Derived, never integrated — recovered algebraically from the binding polynomial
+
+`P_c` (ID3·PTF1A) · `E_free` · `C_L` (PTF1-L) · `C_J` (PTF1-J)
+
+> **`P_c` is no longer a state and its sequestration did not disappear.** PTF1A partitions into free and ID3-bound through the **same competitive equilibrium** that partitions E — one polynomial, two targets (§3.2). Deleting `−k_seq·I·P_n` without moving sequestration into the equilibrium would swap one error for its opposite.
+
+**Slow-state arithmetic, since state count is the schedule risk.** CORE is 8 states. At reduction: `C_L`, `C_J`, `E_free`, `P_c` are already algebraic; `I` is the QSS candidate; `W` is retained by exemption. That leaves **6 slow states — `P_n`, `R`, `E_tot`, `M`, `A`, `S` — plus `W`.** Within the stated 5–6 target, with `W` as the one declared exception. Variant states are absent from Stage 1's continuation, which runs on CORE with the payload at zero.
 
 **Forcing input:** `K` = ERK activity, set by KRAS-G12D induction level.
 **Control inputs:** `u₁` RBPJL mRNA, `u₂` PTF1A mRNA, `u₃` third mRNA, `v` trametinib.
@@ -171,9 +185,11 @@ Write the full system, then **nondimensionalize and adiabatically eliminate the 
 
 **PTF1A — two sources, one PTF1-independent**
 ```
-dP_n/dt = α_ign·g(K,v) + α_auto·Hill(C_L, M; n) − δ_P·P_n − k_seq·I·P_n + u₂(t)
+dP_n/dt = α_ign·g(K_eff) + α_auto·Hill(C_L, M; n) − δ_P·P_n + u₂(t)
 ```
-`α_ign·g(K,v)` is the 13.4-kb ignition, suppressed by ERK, released by trametinib. `α_auto·Hill(·)` is the 2.3-kb autoregulatory enhancer.
+`α_ign·g(K_eff)` is the 13.4-kb ignition, suppressed by ERK, released by trametinib — note it takes `K_eff`, which already carries the drug through `W` and `f_cat`, so writing `g(K,v)` here would double-count it. `α_auto·Hill(·)` is the 2.3-kb autoregulatory enhancer.
+
+> ⚠ **The term `− k_seq·I·P_n` was here and has been deleted. Do not restore it.** It is a first-order sink, which §3.4's constraint 2 forbids and which this section's own titration paragraph calls out as generating no ultrasensitivity. **Sequestration has not been removed — it has been moved into the binding polynomial below**, where PTF1A and E partition through one shared competitive equilibrium. `P_n` here is *free* nuclear PTF1A; the ID3-bound and complexed pools are derived, not integrated.
 
 **RBPJL — the asymmetry that makes the system interesting**
 ```
@@ -181,11 +197,21 @@ dR/dt = β·Hill(C_L; m) − δ_R·R + u₁(t)
 ```
 **No ignition term.** *Rbpjl* has no PTF1-independent promoter. This asymmetry is the structural reason RBPJL is the deepest hole, and it falls out of the equations rather than being asserted.
 
-**ID3 sequestration — titration, not a first-order sink**
+**ID3 sequestration — TWO-TARGET competitive titration, not a first-order sink**
+
+ID3 traps **both** partners of an obligate heterodimer. Verified: Dufresne 2010 (*Int J Cancer* 129(2):295–306, PMID 20830706) reports gastrin raising Id3 and increasing **both** Id3/E47 **and** Id3/Ptf1-p48 interactions while *decreasing* E47/Ptf1-p48 — in AR4-2J, the wet-lab line. Silencing Id3 reversed the mislocalisation.
+
+One conserved equilibrium, three complexes, solved simultaneously:
+
 ```
-E_free = E_tot − (ID3·E complexes) − (PTF1-bound E)      [solve the binding polynomial]
+E_tot   = E_free + [ID3·E] + (E bound in C_L and C_J)
+P_tot,n = P_n    + [ID3·P] + (PTF1A bound in C_L and C_J)
+I_tot   = I_free + [ID3·E] + [ID3·P]
 ```
-ID3 does not export PTF1A. It **titrates the E-protein pool**, blocking nuclear import of the complex. A first-order sink `−k·I·P_n` generates no ultrasensitivity; **molecular titration of a stoichiometric partner is a classical ultrasensitivity generator** and can produce switching without high Hill coefficients. This rewrite is ~10 lines and may be the difference between a model that can be bistable and one that cannot.
+
+**Why this is the term that decides whether the model can be bistable.** A first-order sink `−k·I·P_n` generates **no** ultrasensitivity. Molecular titration of a stoichiometric partner is a classical ultrasensitivity generator and can produce switching without high Hill coefficients — and a titrator that sequesters **both** members of an obligate heterodimer gives a **sharper** threshold than one sequestering either alone, because both routes to complex formation are shut simultaneously.
+
+**The full algebra, every step, is in `docs/derivations/binding_polynomial.md` — not only in code.** This term is load-bearing for the central claim and must be followable line by line.
 
 **Chromatin as slow, self-reinforcing memory at metaplasia loci**
 ```
@@ -210,10 +236,23 @@ K_eff  = K · W · f_cat(v)                                         ← f_cat bl
 
 **`τ_W = 1/k_off` is sampled, not fixed** — minutes (pure phospho-MEK turnover) to hours (the feedback-relief components, DUSP/SPRY, are transcriptional). The overshoot's *duration* sets the impulse `∫ΔK_eff dt`, which is what decides whether the separatrix is crossed, so `τ_W` is one of the parameters that determines the §1.2 ensemble fraction. Fixing it would presuppose the answer.
 
-**Viability — a ratio with a kinetic mismatch, not a ceiling**
+**Viability — a U-shaped hazard integrated along the trajectory, not a ceiling**
 ```
-dS/dt = φ(A) − γ(MIST1-driven capacity)·S ;    death when S exceeds tolerance
+dS/dt   = φ(A) − γ(capacity)·S
+h(S,P_n) = h_high(S) + h_low(P_n)                     ← rises at BOTH ends
+survival(t) = exp( −∫₀ᵗ h(S(τ), P_n(τ)) dτ )
 ```
+
+> ⚠ **"death when `S` exceeds tolerance" was here and has been deleted. Do not restore it.** A one-sided threshold on `S` is the `U_crit` construct the panel killed, in new clothing.
+
+`h_high(S)` — cargo outrunning capacity. `h_low(P_n)` — CHOP-dependent apoptosis under PTF1A loss (Sakikubo 2018, PMID 30361559; Backx 2021, PMID 33762742).
+
+**Three reasons the hazard is right and not merely a smoothed threshold:**
+1. It is **genuinely U-shaped**, which the plan asserts and the deleted form contradicted.
+2. It **integrates along the trajectory**, so a brief excursion costs survival without automatically killing — matching the panel's finding that the risk is a **rate** mismatch during the transient, not an amplitude ceiling.
+3. It yields a **continuous 0–1 viability number**, which is what the y-axis of the reversal–viability figure actually needs. A binary alive/dead flag cannot be plotted against a continuous reversal axis.
+
+`γ(capacity)` is carried by the **`MIST1` state in T5** and by a constant elsewhere — see §3.5. Folding capacity into `γ(A)` was considered and rejected: it makes T5 unimplementable and rigs Stage 3's ranking of MIST1 as u₃.
 > **Do not use a one-sided `U_crit`.** Secretory *capacity* — chaperones, ER membrane, XBP1, vesicle trafficking — is co-induced by the same differentiation program via MIST1 (Jakubison 2018, PMID 29719936). At steady state the cargo/capacity ratio is invariant and a ceiling does not exist. In every published experiment where full redifferentiation occurred, the cells survived.
 
 The defensible version is a **kinetic mismatch during the transient**: cargo ramps faster than capacity, so the risk is a *rate* limit, not an *amplitude* limit. And the curve is **U-shaped** — too little PTF1A also kills, via CHOP-dependent apoptosis (Sakikubo 2018, PMID 30361559), and blocking dedifferentiation under stress increases death (Backx 2021, PMID 33762742).
@@ -225,6 +264,21 @@ The defensible version is a **kinetic mismatch during the transient**: cargo ram
 *(Deliberately "a combination" rather than "the 3-mRNA combination": the necessity analysis in §1.3 is allowed to conclude that fewer components suffice, and the headline must not presuppose the answer to a question the project is asking.)*
 
 Better than "reversal and viability are two boundaries of one window" because it **explains an existing published discrepancy** (§6, HO-2) instead of asserting a geometry.
+
+## 3.5 Composable topologies — one right-hand side, not five files
+
+**The problem this solves.** With `W`, `E_tot`, `MIST1` and `NR5A2` the state list grows from 10 to ~13. Stage 0 targets **5–6 slow states**, and continuation on a large system is the single biggest schedule risk in this project. Adding four states without addressing that is how the plan quietly becomes unrunnable.
+
+**The resolution: not every state exists in every topology.**
+
+- **CORE** — the loop itself: `P_n`, `R`, `E_tot`, `I`, `M`, `A`, `S`, `W`. This is what **Stage 1 continues on**, with the payload at zero. Reduces to **6 slow + `W`**.
+- **VARIANT** — `MIST1` exists only in **T5**. `NR5A2` exists only in the variants that test it. Switched on for the stages that need them, absent otherwise.
+
+**Implementation rule, binding on all later stages:** a **base right-hand side plus optional terms selected by a config flag** — *never* five copied files that drift apart. Stage 2 must swap topologies with **one argument**; Stage 3's sensitivity analysis must run over whichever state set is active; Stage 5's necessity analysis must toggle each of the four interventions independently and swap `u₃`'s identity.
+
+A topology is therefore a **configuration object**, not a source file. The five Stage 2 candidates (T1–T5) differ by which optional terms are active, and the sampler, integrator and scoring code are shared by construction — which is exactly what the Ma et al. 2009 Q-value methodology requires, since an unequal comparison across topologies is not model selection.
+
+Reasoning and reversal conditions: `docs/decisions/003-composable-topology-architecture.md`.
 
 ## 3.4 ⚠ SPECIFIED HERE vs. DERIVED IN STAGE 0
 
@@ -288,6 +342,9 @@ Seven stages. One argument. Each stage changes what the next stage *does*, not j
 | **T3** | RBPJ→RBPJL handoff as the memory | Masui 2010, PMC2902682 |
 | **T4** | Slow self-reinforcing chromatin at metaplasia loci | Falvo 2023 |
 | **T5** | MIST1 parallel arm carrying secretory capacity | Jakubison 2018 |
+| **T6a/T6b** | **NR5A2 as enhancer co-activator** (on `α_auto`) vs **NR5A2 as acinar-output co-activator** (on `A`) | Holmstrom 2011 — see §3.2 caveat |
+
+**T6a vs T6b exists because NR5A2's placement is an assumption, not a finding.** Holmstrom 2011 (PMID 21852532, GSE34295) shows LRH-1/NR5A2 and PTF1-L co-regulating an **exocrine transcriptional network** — co-occupancy on digestive-enzyme genes. It does **not** demonstrate binding at the *Ptf1a* autoregulatory enhancer. Rather than pick one and hide the assumption, both placements enter the competition and the Q-values decide. This also gives Stage 3 a genuine comparison for the u₃ slot: **E47 helps by relieving titration, NR5A2 helps by boosting transcription — two different mechanisms competing for one payload slot.**
 
 **Discriminator is §2.5:** MEKi reverts in 3 days, forced PTF1A takes 3 weeks. Topologies where PTF1A is the sole bottleneck **cannot** produce a 10× asymmetry. Topologies where the rate-limiting step is RBPJL accumulation, chromatin, or E-protein availability **can**.
 
@@ -436,6 +493,8 @@ Order matters to leading order **iff the Lie bracket of the closed-loop vector f
 **Validate three ways:** (a) recovers both known sites in the 2.3-kb enhancer; (b) composite hits enriched in **GSE86262** PTF1A ChIP-seq peaks vs shuffled; (c) scanning N₃/N₄/N₆/N₇ shows a sharp optimum at **N₅** — reproducing Beres 2006 (PMID 16354684) from data.
 
 **Rat bridge:** rn7 has **no conservation tracks at all**. Use **mm39 `cons35way`** (rat is an aligned species), then liftOver to rn7 via the verified `chainMm39`/`netMm39` tracks.
+
+**Added task — settle the NR5A2 placement assumption qualitatively.** T6a assumes NR5A2 acts at the *Ptf1a* autoregulatory enhancer, which Holmstrom 2011 does not show. **GSE34295 can partially settle it:** *"is there LRH-1 signal at the Ptf1a locus, yes or no"* is answerable from that data. **Qualitative only** — it is 2 samples, single-replicate, 2011-era ChIP-seq with no biological replication, so it may support presence/absence and nothing more. A yes/no here does not set a parameter; it tells T6a whether its central assumption has any footing. Do not report a number from it.
 
 ---
 

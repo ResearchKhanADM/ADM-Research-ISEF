@@ -33,6 +33,25 @@ Repo: https://github.com/ResearchKhanADM/ADM-Research-ISEF (public)
 
 **6. Append to `docs/PROGRESS.md` at the end of every session** — done / broke / next / open questions. Push.
 
+## ⚠ Composable topologies — a topology is a config object, never a source file
+
+The state list grew to ~13. **Not every state exists in every topology**, and that is what keeps the slow count at 6.
+
+- **CORE** — `P_n`, `R`, `E_tot`, `I`, `M`, `A`, `S`, `W`. Stage 1 continues on this, payload at zero. Reduces to **6 slow (`P_n`, `R`, `E_tot`, `M`, `A`, `S`) + `W` retained**; `I` is the QSS candidate, `P_c`/`E_free`/`C_L`/`C_J` are algebraic.
+- **VARIANT** — `MIST1` in T5 only. `NR5A2` in T6a/T6b only.
+
+**Binding rule: one base right-hand side plus optional terms behind config flags.** Never five copied files — they drift, and an unequal comparison across topologies is not model selection (Ma 2009). Stage 2 swaps topology with one argument; Stage 3 runs sensitivity over whichever states are active; Stage 5 toggles all four interventions independently and swaps `u₃`'s identity. Reasoning: `docs/decisions/003-composable-topology-architecture.md`.
+
+## ⚠ Sequestration is ONE equilibrium with TWO targets
+
+ID3 traps **both** E47 and PTF1A (Dufresne 2010, PMID 20830706, in AR4-2J). `P_n` is **free** nuclear PTF1A; `P_c`, `E_free`, `C_L`, `C_J` are derived from the shared binding polynomial, never integrated.
+
+The first-order sink `−k_seq·I·P_n` is **deleted and must not return** — but note *why*: sequestration did not disappear, it moved into the equilibrium. Deleting it outright is the opposite error. Full algebra with every step: `docs/derivations/binding_polynomial.md`. This term decides whether the model can be bistable at all.
+
+## ⚠ Viability is a U-shaped hazard, never a threshold
+
+`h(S,P_n)` rises at both ends — high `S` (cargo outruns capacity) and low `P_n` (CHOP-dependent apoptosis). `survival = exp(−∫h dt)`. **"Death when `S` exceeds tolerance" is deleted** — it was `U_crit` in new clothing. The hazard integrates along the trajectory, so a brief excursion costs survival without automatically killing, and it yields the continuous 0–1 number the headline figure's y-axis needs.
+
 ## ⚠ `W` IS PROTECTED FROM ELIMINATION
 
 The model has **11 states**, not 10. `W` (phospho-MEK pool) is **fast by turnover — minutes — and must NOT be eliminated in the Stage 0 fast-variable sweep.**
