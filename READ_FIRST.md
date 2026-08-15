@@ -19,12 +19,11 @@ Nothing is blocked on me; two things are blocked on Luqmaan (below).
 
 | Job | Launched | Expected | Output | Quarantines |
 |---|---|---|---|---|
-| `scripts/run_sobol.py --n-base 512` | session 9 | ~25–60 min, 55,296 evals | `logs/sobol.log`, `results/sobol/` | nothing — it is new work. Checkpoints every 5,000; `--resume` picks up |
+| *(none — Sobol completed)* | — | — | `results/sobol/` | — |
 
-**On completion, first check `P2_STOP_CONDITION_FIRED` in
-`results/sobol/summary.json`.** If true, **stop and report** — `γ` with `S1 > 0.15`
-contradicts decision 015's test 3 and is a **bug hypothesis first, a finding
-second**. Also check `P6_check_hill_exponents_absent_from_indices` is `true`.
+**Sobol completed. P2 did NOT fire** (`S1(γ) = 0.0000`), **P6 holds**, failure rate
+**0.0000%** overall and in every quintile of every parameter. Scored: P2 HIT,
+P6 HIT, **P1 MISS**, **P4 partial**, **P3 partial — the step is real**.
 
 ## LIVE NUMBERS
 
@@ -39,7 +38,11 @@ second**. Also check `P6_check_hill_exponents_absent_from_indices` is `true`.
 | Parameter budget | 12 free groups (10 fitted + 2 scanned) | — | `docs/PHASE2_PARAMETER_BUDGET.md` | **LIVE** |
 | Separatrix angular coverage | largest gap `185°` vs `7.5°` uniform | deg | `results/gate_b/summary.json` | **LIVE** — means the 48 rays **collapsed**; what is computed is the *in-plane* 1-D separatrix, not the 2-D `W^s` |
 | Fold loci vs `a_P`, `b_P` | see `results/fold_loci/` | ERK | rerun completed post-fix | **LIVE** |
-| Sobol indices | — | — | `results/sobol/` | **PENDING** — job running |
+| Sobol ST, window width | `κ` 0.663 · `a_P` 0.365 · `c_rep` 0.222 · `α_C` 0.215 | — | `results/sobol/summary.json` | **LIVE** |
+| Sobol S1(`γ`), S1(`ρ`) | `0.0000` exactly | — | same | **LIVE** — a *theorem*, not a measurement: both multiply a whole RHS row, so neither moves an equilibrium |
+| `C` multistable in the box | `1.73%` (954/55,296) | — | `results/sobol/p3_verdict.json` | **LIVE** — **R3's caveat STANDS** |
+| `ε` in every multistable sample | `> 1.7919` | — | same | **LIVE** — all above `EPS_MEMORY_THRESHOLD`, **zero violations in 55,296** |
+| Window width when `C` multistable | `4.57` vs `1.44` | ERK | same | **LIVE** — 3.2× wider |
 
 **All times are in `1/δ_P`.** There is no clock until bench item 9 lands. No
 figure gets an hours axis; no placeholder conversion, ever, including drafts.

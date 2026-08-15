@@ -8,8 +8,18 @@ answering the question they were attached to.
 
 **R3 holds conditional on `C` being a lagged filter rather than a bistable memory. The boundary is `ε = 1.54`. The pre-registered sweep straddles it. If the plausible range for `ε` sits above 1.54, `C` can hold its own state after withdrawal and re-suppress the acinar program, and R3 inverts.**
 
-It is named, it is bounded by a number, and it will be tested by a
-sweep registered before it runs. That is the whole answer to *"what would
+**TESTED, 2026-08-15, by the pre-registered sweep — THE CAVEAT STANDS.** `C`
+becomes multistable in **1.73%** of the pre-registered box (954 of 55,296), and
+**every one of those samples has `ε > 1.7919`** — i.e. all above the analytic
+threshold 1.5396, **zero violations**. The threshold is necessary but not
+sufficient: only 14.7% of above-threshold samples are actually multistable, since
+the chromatin drive must also be in range. **Where it does happen the persistence
+window is 3.2× wider** (4.57 vs 1.44). So R3 is **conditional**, the condition is
+real and reachable inside the plausible box, and the conditional goes on the
+poster.
+
+It is named, it is bounded by a number, and it was tested by a
+sweep registered before it ran. That is the whole answer to *"what would
 reverse your conclusion?"* — not a hedge, a coordinate.
 
 ---
