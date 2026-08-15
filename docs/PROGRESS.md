@@ -1,0 +1,77 @@
+# Progress log
+
+Append one entry per session. Newest at the bottom, so `git log` and this file
+read in the same direction. Every entry: **done / broke / next / open questions.**
+
+---
+
+## 2026-08-14 · Session 1 — setup only, no science
+
+### Done
+
+- Project created at `C:\Users\luqma\adm-insil-des`. No spaces in the path, by design.
+- Git initialised, `core.autocrlf true`, remote `origin` →
+  `https://github.com/khanluqmaanresearch-byte/ADM-Research.git`, branch `main`.
+- Directory structure built per the kickoff spec. `data/`, `results/`, `logs/`
+  exist locally but are gitignored, so **a fresh clone will not have them** —
+  anything that writes there must `mkdir` first.
+- `.gitignore` written to spec. Checked before the first push: no `.env`, no
+  keys, no credentials, no datasets staged. The repo is public.
+- venv on **Python 3.13.9** (the standalone install at
+  `AppData\Local\Programs\Python\Python313`, deliberately not the miniconda base
+  — mixing conda and venv on Windows is a debugging tax nobody needs in month 4).
+- All eleven required packages installed **and imported**. CasADi and scanpy both
+  had native Windows wheels; no substitutions, no workarounds.
+- `scripts/verify_env.py` — repeatable import check, exits 1 on failure. It exists
+  because "pip said success" and "the import works" are different facts on
+  Windows, where CasADi ships compiled binaries that can fail on a missing DLL.
+- `requirements.txt` (floors) + `requirements-lock.txt` (exact, verified). The
+  lockfile is the one that matters in five months.
+- Master plan copied to `docs/ADM_INSILICO_MASTER_PLAN.md`; `CLAUDE.md` at root.
+- `docs/decisions/000-TEMPLATE.md` seeded.
+
+### Verified versions
+
+python 3.13.9 · numpy 2.5.2 · scipy 1.18.0 · matplotlib 3.11.1 · pandas 3.0.5 ·
+sympy 1.14.0 · casadi 3.7.2 · SALib 1.5.2 · h5py 3.16.0 · anndata 0.13.2 ·
+scanpy 1.12.3 · pyyaml 6.0.3
+
+### Broke
+
+- Nothing blocking. Two things worth recording:
+  - The GitHub repo already carried an `Initial commit` with a one-line stub
+    README. Built **on top of it** rather than force-pushing over it — the
+    history is the evidence trail and overwriting it would have cost the
+    timestamp on the first commit for no gain.
+  - `verify_env.py` first reported SALib as version "unknown" and raised
+    FutureWarnings from anndata/scanpy, because it read `module.__version__`.
+    Rewritten to use `importlib.metadata`. Fixed, not suppressed.
+
+### Next
+
+- **Stage 0 · Reduce and certify.** Per master plan §3.4 the deliverables are:
+  explicit functional forms for `Hill(·)`, `g(K,v)`, `φ(A)`, `f_act`, `f_cat`;
+  the E-protein binding polynomial solved; nondimensionalisation (~30 parameters
+  → ~15–18 groups); QSS elimination of `P_c`, `E`, `C_L`, `C_J` **with the
+  algebra showing it is valid**; the parameter table with ranges and sources;
+  ADM and acinar initial conditions; solver settings.
+- Ambiguous functional forms go to `docs/decisions/`, not to a blocker.
+- No sweep may run until its `prereg/` ranges and prediction are committed **and
+  pushed**. That is not a formality — the headline validation in Stage 4 is a
+  held-out prediction, and its value is the pushed timestamp.
+
+### Open questions — need Luqmaan
+
+1. **AR42J Kras genotype. Highest-stakes unknown in the project** (master plan
+   §7.1). AR42J came from an azaserine-induced rat tumour and those are
+   classically Kras-mutant. If the stock is already mutant, inducing G12D on top
+   is close to meaningless: the forcing term changes and the project becomes
+   "KRAS dose titration on a mutant background". This changes Stage 0's forcing
+   input, so it wants resolving early — not before Stage 0 starts, but before
+   Stage 1 fixes the KRAS axis. Resolve by sequencing the stock.
+2. **Two superseded plan drafts are still on this machine** —
+   `INSILICO_PLAN_8months.md` and `INSILICO_PLAN_v2.md`, in the Claude outputs
+   folder. The master plan says explicitly not to read or merge them. Worth
+   deleting or moving them so a future session cannot pick one up by accident.
+3. **No `gh` CLI installed.** Not needed for anything so far; push works over
+   HTTPS. Flagging only so it is not a surprise later.

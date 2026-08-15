@@ -1,0 +1,24 @@
+# Core stack for the ADM reversal in-silico project.
+# Pinned to major/minor floors, not exact versions: this repo must still install
+# in five months, and the wet lab runs in the same cycle.
+
+# --- numerics: the ODE core ---
+numpy>=1.26
+scipy>=1.11          # solve_ivp BDF/Radau — stiffness ratio here is ~1e4-1e5
+sympy>=1.12          # symbolic Jacobian, Lie bracket (Stage 6), QSS algebra (Stage 0)
+casadi>=3.6          # symbolic AD; alternative route to the Stage 6 bracket
+
+# --- sampling and sensitivity ---
+SALib>=1.4           # Latin hypercube + Sobol for the Stage 2 topology box
+
+# --- data ---
+pandas>=2.0
+h5py>=3.10
+anndata>=0.10        # .h5ad readers for the Stage 7 single-cell datasets
+scanpy>=1.10
+
+# --- plotting ---
+matplotlib>=3.8
+
+# --- project plumbing ---
+pyyaml>=6.0          # prereg/*_ranges.yaml is the pre-registration artifact

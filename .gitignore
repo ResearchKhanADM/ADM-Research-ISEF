@@ -1,0 +1,27 @@
+# data and outputs — never committed
+data/
+results/
+logs/
+*.h5ad
+*.h5
+*.pkl
+*.npz
+*.mtx
+*.tar
+*.gz
+
+# secrets
+.env
+*.key
+credentials*
+
+# python
+venv/
+.venv/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# os
+Thumbs.db
+.DS_Store
