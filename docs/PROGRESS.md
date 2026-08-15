@@ -108,3 +108,39 @@ scanpy 1.12.3 · pyyaml 6.0.3
   citation the master plan gives for Collins 2014 — *Gastroenterology*
   146(3):822–834.e7, doi 10.1053/j.gastro.2013.11.052. That is one independent
   check on the plan's most load-bearing reference.
+
+### Plan change — two-arm payload derivation (Luqmaan's call, before any code)
+
+Caught a real problem in the plan before Step 1 was written: **the payload
+species are state variables, so asking the ODE "which molecules?" is circular.**
+Fixed by splitting the question across two arms rather than by rewording it.
+
+- **Mechanistic arm reframed** to three non-circular questions — necessity
+  (16 subsets of the four interventions), dose/schedule/order, and whether the
+  reversal-optimal and viability-optimal payloads are the *same* payload.
+- **New Stage 3B** — CellOracle in-silico perturbation screen (PMID 36755098) on
+  GSE207938, full TF repertoire, ranked output, pre-registered. Placed after
+  Stage 3 to keep the two arms independent; shares datasets with Stage 7;
+  2nd in cut order.
+- Both PMIDs verified against PubMed before being written into the plan:
+  36755098 = *Nature* 614(7949):742–751 (2023); 36584685 = *Stem Cell Reports*
+  18(1):97–112 (2022), which rescued a failing conversion by nominating Fos and
+  Yap1 — factors the field did not expect, which is what makes it a real
+  precedent.
+- Reasoning and reversal conditions: `docs/decisions/001-two-arm-payload-derivation.md`.
+
+Three things added that were not requested, because they are where this gets
+attacked:
+
+1. **The RBPJL-motif risk.** CellOracle propagates through motif-derived edges;
+   a TF with no motif has no outgoing edges and scores ≈ 0 *silently*, looking
+   like "RBPJL doesn't matter" rather than "RBPJL is not representable." RBPJL is
+   the one component the whole argument rests on. Pre-flight check, not a
+   post-hoc caveat.
+2. **A fair-dose rule for the necessity analysis.** Dropping a component changes
+   total delivered material, so subsets must be compared at matched *total* dose
+   as well as matched per-component dose — otherwise the analysis rediscovers
+   "more protein is better." Same discipline Stage 6 already imposes on ordering.
+3. **An explicit Perturb-seq vs Stage 3B note** in both the plan's ruled-out
+   table and `CLAUDE.md`. Without it, the obvious reading is that a killed module
+   was smuggled back in.

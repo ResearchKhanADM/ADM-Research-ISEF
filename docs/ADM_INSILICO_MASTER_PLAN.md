@@ -56,6 +56,20 @@ Collins used PD325901. Trametinib is the clinical drug and the right choice, but
 
 **The third slot is a model output, not an assumption.** Stage 3 ranks candidates for u₃ — E47/TCF3, NR5A2, MIST1/BHLHA15 — by how much each moves the reversal boundary per unit dose across the parameter ensemble. If the model nominates NR5A2 over E47, that is a result, not a correction. Keep the slot parameterized in code.
 
+> ### ⚠ The circularity limit on what this model may claim
+>
+> RBPJL, PTF1A and the E-protein are **state variables**. A model whose states are the payload species cannot be asked *"which molecules should be supplied?"* — it can only nominate what was written into it, and the answer is fixed by the model's construction rather than by the biology. Ranking a **pre-specified** three-candidate list for u₃ narrows this but does not escape it, because the list was curated by the same person who chose the states.
+>
+> **The mechanistic model is therefore asked only questions it can answer without circularity:**
+>
+> 1. **Necessity — which components are actually required.** Four interventions (trametinib, u₁, u₂, u₃) give **16 subsets**. Run all 16 across the parameter ensemble; report which components are necessary, which are redundant, and the marginal contribution of each. **"Three mRNAs is over-engineering" is a valid and useful outcome** — it is cheaper at the bench and it is a real finding, not a failure.
+> 2. **Dose, schedule and order** — Stages 5 and 6, unchanged.
+> 3. **Whether the reversal-optimal payload and the viability-optimal payload are the same payload.** This is a Pareto question, not a single optimum. If the two differ, that is a headline result and it is exactly the stated objective — reversal **and** viability, not either alone. If they coincide, say so; it is a cleaner recommendation for the bench.
+>
+> **Molecule identity comes from the other arm** — the unbiased screen in **Stage 3B**, which starts from a candidate set the modeller did not curate and is capable of ranking PTF1A, RBPJL and NR5A2 low. See `docs/decisions/001-two-arm-payload-derivation.md`.
+>
+> **Fair-comparison rule for the necessity analysis.** Dropping a component changes total delivered material, so a naive subset comparison rediscovers *"more protein is better."* Report each subset **twice**: once at matched per-component dose, and once at matched **total** delivered dose (∫Σuᵢdt held constant, redistributed over the surviving components). A component is only "necessary" if it survives the matched-total comparison. This is the same discipline Stage 6 imposes on ordering, for the same reason.
+
 **Why mRNA makes the control problem sharper, not softer.** With a viral vector, expression is a step of unknown height and indefinite duration. With mRNA the input is a **pulse of known shape**: uptake, translation ramp, first-order decay with a measurable half-life. Therefore:
 
 - **"Duration" is not a free variable.** It is set by mRNA half-life plus redosing interval. The therapeutic window is not an abstract (dose × duration) plane — it is **(dose per pulse) × (redosing interval)**, a schedule someone can execute.
@@ -182,7 +196,9 @@ The defensible version is a **kinetic mismatch during the transient**: cargo ram
 
 ## 3.3 The headline claim
 
-> **Published interventions that reverse ADM occupy two distinct positions in a reversal–viability plane, and the difference is predictable from how many survival branches the intervention severs. The model predicts where the trametinib + 3-mRNA combination lands, and on what schedule.**
+> **Published interventions that reverse ADM occupy two distinct positions in a reversal–viability plane, and the difference is predictable from how many survival branches the intervention severs. The model predicts where a trametinib + mRNA combination lands, on what schedule — and which components of it are actually necessary.**
+
+*(Deliberately "a combination" rather than "the 3-mRNA combination": the necessity analysis in §1.3 is allowed to conclude that fewer components suffice, and the headline must not presuppose the answer to a question the project is asking.)*
 
 Better than "reversal and viability are two boundaries of one window" because it **explains an existing published discrepancy** (§6, HO-2) instead of asserting a geometry.
 
@@ -270,6 +286,45 @@ Seven stages. One argument. Each stage changes what the next stage *does*, not j
 **Buys.** (a) pre-empts the hardest question. *"Thirty unmeasured parameters, three observations — why isn't this curve-fitting?"* becomes: *"the model is sloppy, here is the spectrum, here are the stiff directions carrying every prediction, and here is why the topology ranking is robust to the sloppy ones."* Gutenkunst et al. (PMID 17922568) — whose own prescription is **"focus on predictions rather than parameters."**
 
 **Do not compute AIC/BIC.** With n ≈ 10 and k ≈ 30 it is illegitimate, and someone will ask.
+
+## STAGE 3B · In-silico perturbation screen — 2–3 weeks · ★ THE UNBIASED ARM
+
+**Why this stage exists.** The mechanistic model's states *are* the payload species, so it cannot derive payload identity without circularity (§1.3). This arm supplies identity from data the modeller did not curate.
+
+**Do.** **CellOracle** (Kamimoto, Stringa, Hoffmann, Jindal, Solnica-Krezel & Morris, *Nature* **614**(7949):742–751, 2023, PMID 36755098) on pancreatic scRNA-seq containing **both** acinar and metaplastic populations. Infer the GRN, simulate overexpression across the **full TF repertoire present in the network** — not a three-candidate shortlist — score the shift of the ADM/metaplastic cluster toward the acinar cluster, and produce a **ranked list**.
+
+**Dataset.** Start with **GSE207938** — smallest, cleanest, <1 GB, and already required for Stage 7. **Download once, use twice.** Repeat on **GSE172380** as the stability check (below).
+
+**Precedent for this exact task shape.** Kamimoto, Adil, Jindal, Hoffmann, Kong, Yang & Morris, *Stem Cell Reports* **18**(1):97–112, 2022, PMID 36584685 — in-silico perturbation identified the factors that rescue a **failing** fibroblast→iEP conversion, nominating **Fos** with **Yap1**. Note what makes it a good precedent: the nominated factors were *not* the field's prior expectation. A screen that can only confirm is not a screen.
+
+### Why this is not the Perturb-seq module that was killed
+
+Reasonable objection, and it must be answered in the writeup before a judge raises it. The killed approach was **vector arithmetic on Replogle Perturb-seq**, and the reason it was killed was **cell context**: RBPJL is "Not detected" in every Human Protein Atlas cell line, the K562 library targeted only K562-expressed genes, and the RPE1 library is common-essential only — so the genes of interest **structurally could not be in the library**. That is a property of the *data source*, not of in-silico perturbation as an idea.
+
+CellOracle on a pancreatic dataset changes the data source: acinar and metaplastic cells are present, and the network therefore contains the relevant factors. **The method is different too** — GRN inference plus signal propagation, rather than treating measured perturbation profiles as displacement vectors to be added.
+
+**This is not a free pass.** CellOracle has its own limits, stated here so they are not discovered late:
+
+- **It is local and first-order.** CellOracle propagates a perturbation through a linearised GRN and projects the result onto the existing embedding. It predicts the *direction of movement in the neighbourhood of observed cells*; it does not and cannot establish that a cell crosses a separatrix into another basin. **That is precisely why the two arms are complementary rather than redundant: the screen nominates, the dynamical model tests whether the nomination can actually complete the transition.** State it this way round — it converts a limitation into the division of labour.
+- **Species.** The screen is mouse; the wet lab is rat. This is the same bridge every validation dataset in this project already crosses (Collins and Krah are mouse), so it introduces no new inconsistency — but it is not zero, and it should be said aloud rather than left for someone to notice.
+
+### ⚠ Pre-flight — check these before trusting any output
+
+1. **Is RBPJL perturbable?** CellOracle's edges come from motif scanning, so a TF with no motif in the database has **no outgoing edges** and its simulated perturbation returns ≈ 0 — *silently*, and indistinguishably from "RBPJL doesn't matter." RBPJL is obscure enough that this is a live risk, and it is the one component the entire mechanistic argument rests on. **Confirm RBPJL is present as a regulator with outgoing edges before running anything.** If it is not, report that limitation explicitly and do not let a near-zero RBPJL score be read as a biological result.
+2. **Is the base GRN actually pancreatic?** If the dataset has no matched scATAC, CellOracle falls back to a generic base GRN. Check that the resulting network contains PTF1A→acinar-target edges. If it does not, the screen is measuring the motif database, not the data.
+3. **Is the ranking stable?** Repeat on GSE172380. **Top-20 overlap below ~50% means the ranking is inference noise and no result may be reported from it.**
+
+### Pre-registration — non-negotiable for this stage
+
+Before the screen runs, commit **and push**:
+- `prereg/<date>_celloracle_screen_ranges.yaml` — dataset, preprocessing, GRN settings, TF set, scoring metric.
+- `prereg/<date>_celloracle_screen_prediction.md` — what the screen is predicted to nominate, and **explicitly where PTF1A, RBPJL and NR5A2 are expected to rank.**
+
+**Whatever it returns gets reported, including if it ranks those three low.** A screen whose unwelcome outcomes would not have been published is not evidence, and the pushed timestamp is what makes that commitment checkable. The prediction may legitimately be informed by Stage 3's ranking — say so in the file.
+
+**Proves.** That payload identity was derived by a method capable of returning a different answer.
+
+**Buys.** The answer to *"your model only nominates what you put in it."* Convergence between arms is worth more than either alone, since the two have unrelated failure modes; divergence is more interesting still and arrives early enough to act on.
 
 ## STAGE 4 · Held-out prediction — 2 weeks · ★ THE HEADLINE RESULT
 
@@ -370,13 +425,16 @@ Order matters to leading order **iff the Lie bracket of the closed-loop vector f
 | 1 · Two-parameter bifurcation ★ | 2 | never |
 | 2 · Topology competition ★ | 4 | never |
 | 3 · Identifiability + third mRNA | 3 | 5th |
+| 3B · In-silico perturbation screen ★ | 2–3 | **2nd** |
 | 4 · Held-out prediction ★ | 2 | never |
 | 5 · Dosing schedule | 3 | degrade, don't drop |
 | 6 · Ordering / Lie bracket ★ | 1 | 4th |
 | 7 · Single-cell falsification | 2 | 3rd |
 | Sequence module (parallel) | 2 | **1st** |
 | Figures, writeup, buffer | 3 | — |
-| **Total** | **~22** | |
+| **Total** | **~24–25** | |
+
+**Stage 3B placement.** After Stage 3, deliberately. Running it first would make Stage 3's third-mRNA ranking a downstream confirmation of the screen; running it second keeps the two arms **independent**, so agreement between them is evidence rather than construction. It shares datasets with Stage 7 — **download once, use twice**. In the cut order it goes **2nd**, after the sequence module and before Stage 7: it is more expendable than the falsification arm, and it is never cut before Stage 4.
 
 **Because the wet lab runs in the same cycle**, the stages the bench actually needs are **1** (which KRAS × trametinib doses to test), **5** (mRNA dose and interval), and **6** (the order). Stages 3 and 7 strengthen the writeup but do not change what gets pipetted. If the lab date compresses the schedule, run **0 → 1 → 2 → 4 → 5 → 6** and hand over a protocol.
 
@@ -468,11 +526,13 @@ Explicit **"no evidence found"** after targeted search:
 | AlphaFold/Boltz → `k_on` | AF outputs regress model accuracy, never affinity. And `k_on` is structurally non-identifiable here — binding is quasi-steady-state on transcriptional timescales |
 | Enformer/Borzoi → Hill coefficient | ISM is additive, cannot represent cooperativity; r = 0.137 on enhancers; no rat head |
 | ipTM linker-length scan | ipTM normalizes over chain length — the curve is arithmetic, not biophysics |
-| Perturb-seq cocktail derivation | RBPJL is "Not detected" in every HPA cell line; the libraries structurally cannot contain the genes |
+| Perturb-seq cocktail derivation | RBPJL is "Not detected" in every HPA cell line; the libraries structurally cannot contain the genes. **Still ruled out** — but see the note below, this does *not* rule out in-silico perturbation on a pancreatic dataset |
 | Fast acetylation as a state | Turnover < 30 min → adiabatically slaved → the variable algebraically vanishes |
 | One-sided `U_crit` | Capacity is co-induced with cargo; no ceiling exists at steady state |
 | Structural / Kalman controllability | Linear theorem, generic answer, and *local* while reversal is *global* |
 | Full-dimension HJ reachability, MPC, all-atom MD | O(Mⁿ) intractable; no sensor for feedback; needs µs sampling |
+
+> **Perturb-seq vs Stage 3B — do not confuse these.** Perturb-seq cocktail derivation was killed on **cell context**: the K562/RPE1 libraries could not contain the genes, because those lines do not express them. That is a fact about the *data source*, not a verdict on in-silico perturbation as a method. Stage 3B changes the data source to a pancreatic dataset where acinar and metaplastic cells — and therefore the relevant factors — are present, and changes the method to GRN inference plus signal propagation rather than treating measured perturbation profiles as displacement vectors. The original objection does not transfer. Stage 3B's own distinct limitations are stated in full in that section, including the RBPJL-motif risk, which is the analogous failure mode and must be checked before the screen is trusted.
 
 ---
 

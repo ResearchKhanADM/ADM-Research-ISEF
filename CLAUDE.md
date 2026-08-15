@@ -33,9 +33,21 @@ Repo: https://github.com/ResearchKhanADM/ADM-Research-ISEF (public)
 
 **6. Append to `docs/PROGRESS.md` at the end of every session** — done / broke / next / open questions. Push.
 
+## What the mechanistic model may and may not claim
+
+The payload species **are** state variables, so the ODE cannot derive payload *identity* without circularity. It is never asked "which molecules." It is asked:
+
+- **necessity** — all 16 subsets of {trametinib, u₁, u₂, u₃} across the ensemble; which components are required, which are redundant. Compare at matched **total** dose as well as matched per-component dose, or the result is just "more protein is better." "Three mRNAs is over-engineering" is a valid finding.
+- **dose, schedule, order** — Stages 5 and 6.
+- **whether the reversal-optimal and viability-optimal payloads are the same payload** — a Pareto question. If they differ, that is a headline result and it is the stated objective.
+
+Identity comes from the other arm, Stage 3B. Reasoning in `docs/decisions/001-two-arm-payload-derivation.md`.
+
 ## Already ruled out — do not re-propose
 
 Killed by expert panel with reasons in the master plan: AlphaFold/Boltz → binding rate constants · Enformer/Borzoi (no rat support, wrong output class) · Perturb-seq vector arithmetic for cocktail derivation · fast histone acetylation as a standalone state · one-sided toxicity ceiling · structural/Kalman controllability · full-dimension Hamilton–Jacobi reachability, MPC, all-atom MD.
+
+**Perturb-seq ≠ Stage 3B.** Perturb-seq was killed on *cell context* — K562/RPE1 do not express RBPJL, so the libraries could not contain it. That objection is about the data source and does not transfer to CellOracle on a pancreatic dataset, which has the factors present and uses a different method. Stage 3B carries its own separate limitations; they are listed in the master plan.
 
 To revisit one, argue it in `docs/decisions/` against the plan. Don't just start doing it.
 
@@ -45,6 +57,7 @@ To revisit one, argue it in `docs/decisions/` against the plan. Don't just start
 1. **Two-parameter bifurcation** — KRAS dose × trametinib dose.
 2. **Topology competition** — 5 architectures, one sampling box, compare Q-values. **GATE: does any topology reproduce the 3-day (MEKi) vs 3-week (forced PTF1A) asymmetry?**
 3. **Identifiability + third-mRNA selection** — FIM eigenspectrum; rank E47/TCF3 vs NR5A2 vs MIST1.
+3B. **In-silico perturbation screen** — CellOracle (PMID 36755098) on GSE207938; overexpress across the full TF repertoire, rank by ADM→acinar shift. **Pre-registration is non-negotiable here**, including predicted ranks for PTF1A/RBPJL/NR5A2. Whatever it returns gets reported, including a low rank for those three. Pre-flight: confirm RBPJL has outgoing edges in the base GRN, or its score is meaningless rather than negative.
 4. **Held-out prediction** — **GATE: does the KRAS-history effect fall out of one parameter?**
 5. **Dosing schedule** — (dose per mRNA pulse) × (redosing interval), three-region classification.
 6. **Ordering** — Lie bracket, then isodose phase sweep.
