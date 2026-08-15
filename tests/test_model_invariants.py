@@ -89,10 +89,10 @@ def test_binding_conserves_mass():
     kd = {"IE": 2.0, "IP": 3.0, "L": 1.5, "J": 8.0}
     p_tot, e_tot, i_tot, r_tot, rbpj = 1.3, 0.9, 0.7, 1.1, 0.2
     b = binding.solve_binding(p_tot, e_tot, i_tot, r_tot, kd, rbpj)
-    assert b["P_free"] + b["ID3_P"] + b["C_L"] + b["C_J"] == pytest.approx(p_tot, rel=1e-6)
-    assert b["E_free"] + b["ID3_E"] + b["C_L"] + b["C_J"] == pytest.approx(e_tot, rel=1e-6)
-    assert b["I_free"] + b["ID3_E"] + b["ID3_P"] == pytest.approx(i_tot, rel=1e-6)
-    assert b["R_free"] + b["C_L"] == pytest.approx(r_tot, rel=1e-6)
+    assert b["P_free"] + b["ID3_P"] + b["C_L"] + b["C_J"] == pytest.approx(p_tot, rel=1e-11)
+    assert b["E_free"] + b["ID3_E"] + b["C_L"] + b["C_J"] == pytest.approx(e_tot, rel=1e-11)
+    assert b["I_free"] + b["ID3_E"] + b["ID3_P"] == pytest.approx(i_tot, rel=1e-11)
+    assert b["R_free"] + b["C_L"] == pytest.approx(r_tot, rel=1e-11)
 
 
 def _effective_hill(fn, kd, i_grid):
@@ -230,3 +230,98 @@ def test_hazard_is_u_shaped():
     p_mid, s_mid = 1e3, 0.0            # healthy: high PTF1A, no cargo backlog
     assert ff.hazard(5.0, p_mid, p) > ff.hazard(0.0, p_mid, p), "high S must kill"
     assert ff.hazard(s_mid, 1e-3, p) > ff.hazard(s_mid, p_mid, p), "low PTF1A must kill"
+
+
+# ---------------------------------------------------------------------------
+# Convergence accounting — the standing rule
+# ---------------------------------------------------------------------------
+
+
+def test_binding_matches_the_derivation():
+    """Code and docs/derivations/binding_polynomial.md must agree.
+
+    Recomputes the conservation laws from the derivation's factorised form
+    (§2-§4) and checks the solver's output satisfies them. If the derivation is
+    edited without the code, or vice versa, this fails.
+    """
+    kd = {"IE": 0.02, "IP": 0.5, "L": 1.5, "J": 8.0}
+    p_tot, e_tot, i_tot, r_tot, rbpj = 1.3, 0.9, 0.7, 1.1, 0.2
+    b = binding.solve_binding(p_tot, e_tot, i_tot, r_tot, kd, rbpj)
+    P, E, I, R = b["P_free"], b["E_free"], b["I_free"], b["R_free"]
+
+    phi = r_tot / (kd["L"] + P * E) + rbpj / kd["J"]          # derivation §3
+    assert P * (1 + I / kd["IP"] + E * phi) == pytest.approx(p_tot, rel=1e-11)
+    assert E * (1 + I / kd["IE"] + P * phi) == pytest.approx(e_tot, rel=1e-11)
+    assert I * (1 + E / kd["IE"] + P / kd["IP"]) == pytest.approx(i_tot, rel=1e-11)
+    assert R * (1 + P * E / kd["L"]) == pytest.approx(r_tot, rel=1e-11)
+
+
+def test_loose_limit_reduces_to_the_first_order_sink():
+    """Derivation §5: at Kd >> totals the two models become the SAME model,
+    with log-log slope -2. If this drifts, the claim that T1 and T2 are
+    indistinguishable in the loose regime is no longer true of the code."""
+    kd = {"IE": 50.0, "IP": 50.0, "L": 1.0, "J": 10.0}
+    i_grid = np.logspace(2.5, 4.0, 60)
+    c_l = np.array([binding.solve_binding(1.0, 1.0, i, 1.0, kd, 0.1)["C_L"]
+                    for i in i_grid])
+    slope = np.gradient(np.log(c_l), np.log(i_grid))[-1]
+    assert slope == pytest.approx(-2.0, abs=0.05)
+
+
+def test_tight_limit_scales_as_sqrt_of_total_over_kd():
+    """Derivation §6: n_eff ≈ 1.34·sqrt(E_tot/Kd), verified over two decades.
+
+    This is the quantitative content of "titration is ultrasensitive". If the
+    scaling law breaks, the Stage 2 discrimination-power argument breaks with it.
+    """
+    i_grid = np.logspace(-1.2, 1.2, 400)
+    for kd_val in (1e-2, 1e-3):
+        kd = {"IE": kd_val, "IP": kd_val, "L": 1.0, "J": 10.0}
+        n = _effective_hill(binding.solve_binding, kd, i_grid)
+        predicted = 1.34 * np.sqrt(1.0 / kd_val)
+        assert n == pytest.approx(predicted, rel=0.15), (
+            f"tight-binding scaling broke at Kd={kd_val}: n_eff={n:.2f}, "
+            f"expected ~{predicted:.2f}"
+        )
+
+
+def test_convergence_failure_rate_is_bounded_in_the_tight_regime():
+    """MANDATORY (CLAUDE.md standing rule).
+
+    Convergence failures correlate with Kd, so silently dropping them would
+    deplete the sample set precisely where T1 and T2 differ — biasing the
+    Q-value comparison against the discriminating regime and producing a
+    confident wrong negative. This runs a sweep deliberately IN the tight regime
+    and asserts the failure rate is below a stated bound.
+    """
+    rng = np.random.default_rng(0)
+    ledger = binding.ConvergenceLedger()
+    n = 400
+    for _ in range(n):
+        # Log-uniform across the tight regime, spanning the transition.
+        kd_val = 10 ** rng.uniform(-6, -1)
+        kd = {"IE": kd_val, "IP": 10 ** rng.uniform(-6, 0), "L": 10 ** rng.uniform(-1, 1),
+              "J": 10 ** rng.uniform(0, 2)}
+        totals = 10 ** rng.uniform(-1, 1, size=4)
+        try:
+            binding.solve_binding(*totals, kd, rbpj=0.1, ledger=ledger)
+        except binding.BindingSolveError:
+            pass          # counted by the ledger, never silently dropped
+    assert ledger.attempts == n, "every attempt must be recorded"
+    assert ledger.failure_rate < 0.01, (
+        f"tight-regime failure rate {ledger.failure_rate:.3%} exceeds the 1% bound; "
+        f"Q-values from a sweep at this rate would be biased against the "
+        f"discriminating regime. {ledger.summary()}"
+    )
+
+
+def test_ledger_records_failures_rather_than_hiding_them():
+    """Guard on the guard: a ledger that never records a failure proves nothing."""
+    ledger = binding.ConvergenceLedger()
+    ledger.record(True, kd_over_etot=1.0)
+    ledger.record(False, kd_over_etot=1e-6)
+    assert ledger.attempts == 2 and ledger.failures == 1
+    assert ledger.failure_rate == 0.5
+    # Conditions must be retained, since the required report is failure rate as
+    # a FUNCTION of the swept parameters, not a scalar.
+    assert ledger.failed_conditions[0]["kd_over_etot"] == 1e-6

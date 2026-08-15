@@ -574,6 +574,28 @@ Krah 2019: *"nearly all PanIN-associated acinar cells in [tetO-Ptf1a] mice maint
 
 ---
 
+### ⚠ TIMING vs MAGNITUDE — which targets depend on the observation model
+
+Collins reports *"amylase-positive acinar cells represented approximately 30% of the epithelial cells"*: a **fraction of cells set by a staining threshold**. The model's `A` is a continuous concentration. **A deterministic single-cell model cannot produce that number at all** — there is no population and no spread to threshold. Comparing them directly is a category error, and it is the same wrong-observable failure that killed the PU.1/GATA1 toggle.
+
+**Resolution (Stage 0, Steps 3–4):**
+1. **A minimal observation model** — log-normal spread on one or two key parameters, propagated, then thresholded. This does *not* require the full Gillespie layer; that stays in Stage 7.
+2. **The staining threshold is a SAMPLED NUISANCE PARAMETER**, not a fixed choice — same logic as the ID3 `K_d` prior.
+3. **Prefer timing comparisons over absolute percentages** wherever the target allows it.
+
+| Target | Type | Observation-model dependence |
+|---|---|---|
+| **HO-1** KRAS-history effect | **TIMING** — iKras\* reaches ~50% by day 3, KC shows nothing until after day 5 | **Low.** A *time difference* is far less sensitive to where the cutoff sits than an absolute fraction. This is the headline held-out prediction, and it is the robust kind. |
+| **HO-5** baseline recovery (~7 d; 3 wk in Krah controls) | **TIMING** | **Low.** |
+| **HO-2** viability dissociation | **QUALITATIVE** — opposite corners of the reversal×viability plane | **Low.** Sign and ordering, not magnitude. |
+| **HO-4** hybrid reverted state (SOX9⁺, pERK⁺ persist) | **QUALITATIVE / STRUCTURAL** | **Low.** |
+| **HO-3** PTF1A dose ladder (>15-fold PanIN burden; ~25% vs 4.5× tamoxifen) | **MAGNITUDE** | **HIGH — flagged.** Absolute fold-changes and percentages. Must be reported with the threshold prior propagated, never at a single cutoff. |
+| Collins 30% / 50% amylase⁺ timecourse | **MAGNITUDE** | **HIGH — flagged.** Use as a timing constraint (when does it cross 50%) in preference to a magnitude match. |
+
+**The sentence worth earning:** *"our timing conclusion does not depend on where the staining cutoff is set."* If HO-1 holds across the threshold prior, say exactly that — it converts the project's central prediction from observation-model-dependent to observation-model-robust.
+
+---
+
 # PART 7 · PRE-FLIGHT — verify before the wet lab
 
 1. **⚠ Sequence KRAS in your AR42J stock. Highest-stakes unknown in the project.** AR42J derives from an azaserine-induced rat pancreatic tumour, and azaserine-induced rat acinar tumours are classically Kras-mutant. **If AR42J already carries an activating Kras mutation, inducing G12D on top is close to meaningless** — the "KRAS-induced ADM" framing collapses and the design pivots to **KRAS dose titration on a mutant background** (still clean and defensible, but a different experiment with a different forcing term). *Unverified — PubMed queries returned zero. Resolve before anything else.*

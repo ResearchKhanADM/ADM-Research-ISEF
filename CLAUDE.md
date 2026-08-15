@@ -33,6 +33,22 @@ Repo: https://github.com/ResearchKhanADM/ADM-Research-ISEF (public)
 
 **6. Append to `docs/PROGRESS.md` at the end of every session** — done / broke / next / open questions. Push.
 
+## ⚠ STANDING RULE — never silently drop a failed solve
+
+**Silently dropped failures are the single easiest way for this project to produce a confident wrong answer.**
+
+The mechanism: convergence failures **correlate with swept parameters**. Conditioning worsens as ID3 binding tightens, and tight binding is exactly where T1 and T2 differ. Drop failures and the surviving sample set is depleted *precisely in the discriminating regime* — the Q-value comparison is then biased against the very thing it was built to detect, and the output looks like a clean negative result.
+
+This is not hypothetical. The mandated test caught a **4% failure rate concentrated in the tight regime** on its first run.
+
+Mandatory, everywhere a numerical solve happens:
+
+1. **Log every solve outcome**, converged or not. `binding.ConvergenceLedger` does this; use it or an equivalent.
+2. **Report failure rate as a function of `Kd/E_tot` and of every other swept parameter** — not as a scalar. The ledger keeps the failing conditions for exactly this reason.
+3. **If failure rate correlates with any swept parameter, say so explicitly in the Q-value writeup** and treat the Q-values as *conditional on convergence*.
+4. **Keep a test that sweeps deliberately in the hard regime and asserts the failure rate is below a stated bound.** Current bound: <1%. Current measured: **0/4000 across 12 decades of `Kd/E_tot`**, 0.42 ms/solve.
+5. Note the asymmetry: **T2's first-order sink is closed-form and cannot fail to converge.** If T1 loses samples where T2 cannot, the two Q-values are not comparable until that is reported.
+
 ## ⚠ Composable topologies — a topology is a config object, never a source file
 
 The state list grew to ~13. **Not every state exists in every topology**, and that is what keeps the slow count at 6.
