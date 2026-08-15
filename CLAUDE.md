@@ -33,6 +33,20 @@ Repo: https://github.com/ResearchKhanADM/ADM-Research-ISEF (public)
 
 **6. Append to `docs/PROGRESS.md` at the end of every session** — done / broke / next / open questions. Push.
 
+## ⚠ `W` IS PROTECTED FROM ELIMINATION
+
+The model has **11 states**, not 10. `W` (phospho-MEK pool) is **fast by turnover — minutes — and must NOT be eliminated in the Stage 0 fast-variable sweep.**
+
+QSS on `W` substitutes it straight back into `K_eff` and recovers the static product `K_eff = K·f_act·f_cat`, which provably cannot produce the §1.2 withdrawal-asymmetry prediction: at matched pERK both drugs give identical `K_eff`, so all states evolve identically and withdrawal is identical. **Eliminating `W` is not an approximation of this model — it is a different model making a different prediction.**
+
+Two things that must not drift:
+- **`RAF_drive` is strictly DECREASING in `K_eff`.** Falling ERK relieves negative feedback on RAF, so drive rises as ERK falls. An increasing implementation inverts the mechanism, predicts the opposite, and still runs clean. Asserted in code, covered by a unit test.
+- **`τ_W` is sampled across minutes–hours**, never fixed. It sets the impulse `∫ΔK_eff dt`, which decides whether the separatrix is crossed.
+
+The §1.2 prediction is **conditional**: asymmetry occurs iff the transient overshoot suffices to cross the separatrix. Report the ensemble fraction. 5% is a result; say 5%.
+
+This is the one deliberate fast-variable retention in the model. It will read as an inconsistency to anyone who does not find the justification, so it must be argued in the writeup. Reasoning: `docs/decisions/002-w-state-protected-from-elimination.md`.
+
 ## What the mechanistic model may and may not claim
 
 The payload species **are** state variables, so the ODE cannot derive payload *identity* without circularity. It is never asked "which molecules." It is asked:

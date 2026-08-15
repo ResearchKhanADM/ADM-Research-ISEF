@@ -44,7 +44,17 @@ Collins used PD325901. Trametinib is the clinical drug and the right choice, but
 
 **Model these as two terms, not one.** A pure activity inhibitor lets the RAF→MEK feedback wind up during treatment, so ERK rebounds fast on withdrawal. An activation inhibitor does not.
 
-> **Free prediction: trametinib should show a longer relapse delay after withdrawal than PD325901 at matched pERK suppression.** Falsifiable, mechanistically grounded, and nobody has stated it. Costs one extra term.
+> **Free prediction — conditional form.**
+>
+> *"Withdrawal asymmetry between a MEK-catalytic inhibitor and a MEK-activation inhibitor occurs **if and only if** the transient phospho-MEK overshoot is sufficient to return the state across the separatrix. We report the fraction of the plausible parameter ensemble in which that condition is met, and the overshoot magnitude required."*
+>
+> **Why it must be stated conditionally.** The earlier version — *"trametinib shows a longer relapse delay than PD325901 at matched pERK suppression"* — is not derivable from a static `K_eff = K·f_act(v)·f_cat(v)`. At matched pERK the states see an identical `K_eff`, evolve identically, and reach withdrawal at the same point; a static product has nowhere to store the difference. The asymmetry requires a **state** (`W`, the phospho-MEK pool, §3.2).
+>
+> **And `W` is fast** — MEK phosphorylation turns over in minutes against a model running hours to weeks — so within minutes of washout both drugs converge to the same `W`, while Collins measures relapse at 7 days. The naive reading is that the asymmetry is invisible.
+>
+> **It survives only through bistability.** The overshoot does not need to *persist*; it needs to be large enough to carry the slow state back across the separatrix. Once crossed, relapse proceeds regardless of what `W` does afterwards — **a transient in a bistable system can have a permanent consequence.** That is a real mechanism and a demanding condition, and the honest deliverable is the ensemble fraction, not the claim. **If the condition holds in 5% of the ensemble, report 5% and say what it means.**
+>
+> Note the quantity that decides it is the **impulse** `∫ΔK_eff dt`, not the peak: a minutes-long spike delivers little impulse to a process running on days. Whether it is enough depends strongly on `τ_W`, which is why `τ_W` is sampled across minutes-to-hours rather than fixed (§3.2).
 
 ## 1.3 The payload — three mRNAs, and why mRNA sharpens the control problem
 
@@ -150,6 +160,9 @@ Write the full system, then **nondimensionalize and adiabatically eliminate the 
 | `M` | slow chromatin state at **metaplasia** loci | **slow — the memory** |
 | `A` | acinar output (amylase / CPA1 proxy) | slow |
 | `S` | secretory cargo / capacity ratio | slow |
+| `W` | phospho-MEK pool / RAF→MEK activation drive | **fast — but PROTECTED FROM ELIMINATION, see §3.2** |
+
+**Eleven states, not ten.** `W` was added because the withdrawal-asymmetry prediction in §1.2 is not derivable without it (proof in §1.2).
 
 **Forcing input:** `K` = ERK activity, set by KRAS-G12D induction level.
 **Control inputs:** `u₁` RBPJL mRNA, `u₂` PTF1A mRNA, `u₃` third mRNA, `v` trametinib.
@@ -180,11 +193,22 @@ dM/dt = k_w·φ(K, C_L) − k_e·M + ε·M²/(θ² + M²)
 ```
 > **Do not use `dH/dt = k_write·C_L − k_erase·H`.** Acetylation turnover at p300 sites is **< 30 min** (Weinert 2018, PMID 29804834), so H is adiabatically slaved and `Hill(C_L, H)` collapses to `Hill(C_L, C_L)` — the variable algebraically vanishes. The memory must be slow, self-reinforcing, and located at **metaplasia** loci where the evidence puts it. **This is what sets relapse timing after payload clearance.**
 
-**Trametinib — two terms**
+**Trametinib — two terms acting at different points, and one protected state**
+
+> ⚠ **The static product `K_eff = K·f_act(v)·f_cat(v)` was here and has been deleted. Do not restore it.** It cannot produce the §1.2 prediction: at matched pERK the two drugs give identical `K_eff`, so every state evolves identically and withdrawal is identical. The two terms must act at *different points in the cascade*, which requires a state.
+
 ```
-K_eff = K · f_act(v) · f_cat(v)
+dW/dt  = k_on · RAF_drive(K_eff) · f_act(v)  −  k_off · W        ← f_act blocks FORMATION
+K_eff  = K · W · f_cat(v)                                         ← f_cat blocks OUTPUT
 ```
-`f_cat` = MEK catalytic inhibition (shared with PD325901). `f_act` = inhibition of RAF-mediated MEK phosphorylation (trametinib-specific, suppresses adaptive rebound). Setting `f_act ≡ 1` recovers PD325901 and lets you compare directly to Collins.
+
+`W` is the phospho-MEK pool. `f_cat` = MEK catalytic inhibition, shared with PD325901. `f_act` = inhibition of RAF-mediated MEK phosphorylation, trametinib-specific. **Setting `f_act ≡ 1` still recovers PD325901**, so the direct comparison to Collins is preserved.
+
+**`RAF_drive` must be a *decreasing* function of `K_eff`.** Phospho-MEK accumulates under a catalytic inhibitor *because* falling ERK output relieves ERK-mediated negative feedback on RAF, so RAF drive rises as ERK falls. **Implementing it as increasing inverts the mechanism and the model predicts the opposite result** — silently, since the code still runs. The sign is asserted in the code and covered by a unit test that fails on an inverted implementation.
+
+**`W` is PROTECTED FROM ELIMINATION.** It is fast by turnover (minutes) and the Stage 0 reduction would ordinarily eliminate it — but QSS on `W` substitutes `W_ss ∝ RAF_drive(K_eff)·f_act(v)/k_off` straight back into `K_eff` and **recovers the static product**, destroying the prediction it was added to support. It is the one place in this model where a fast variable is deliberately retained. It is exempt from the fast-variable sweep, and the writeup must say why. Reasoning: `docs/decisions/002-w-state-protected-from-elimination.md`.
+
+**`τ_W = 1/k_off` is sampled, not fixed** — minutes (pure phospho-MEK turnover) to hours (the feedback-relief components, DUSP/SPRY, are transcriptional). The overshoot's *duration* sets the impulse `∫ΔK_eff dt`, which is what decides whether the separatrix is crossed, so `τ_W` is one of the parameters that determines the §1.2 ensemble fraction. Fixing it would presuppose the answer.
 
 **Viability — a ratio with a kinetic mismatch, not a ceiling**
 ```
