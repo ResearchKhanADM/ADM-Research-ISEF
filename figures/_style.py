@@ -7,7 +7,7 @@ inches to fit some template will be wrong the moment the template changes.
 
 THE RULE THIS MODULE EXISTS TO ENFORCE (CLAUDE.md standing rule):
 **figure modules never compute science.** This module provides paint, not data.
-If you find yourself importing `src.model` into a figure, stop — the number
+If you find yourself importing `src.core` into a figure, stop — the number
 belongs in `results/`, written by a stage.
 
 Use `with house_style():` around every render. NEVER mutate `plt.rcParams`

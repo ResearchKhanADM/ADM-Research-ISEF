@@ -119,7 +119,7 @@ prediction is set aside for schedule reasons, not refuted.**
 
 **The binding polynomial (decision 006).** Its *purpose* — discriminating T1 from
 T2 — is gone with the topology competition. Its *content* is not. The derivation's
-result that `n_eff ≈ 1.34·√(E_tot/Kd)` in the tight regime and `n_eff → 2` in the
+result that `n_eff` scales as `√(E_tot/Kd)` in the tight regime and saturates in the
 loose one is a statement about **how sharp the P–R bootstrap threshold is**, and v3
 Phase 3 step 2 convolves the per-cell dose distribution against exactly that
 threshold. A soft threshold and an ultrasensitive one give different
@@ -168,8 +168,11 @@ save, not a problem: it makes the derivation v3's justification rather than dead
 work. **Do not ship the linear form with a floor hack** — the negativity at
 `k·ID3 > E_total` is the approximation announcing it has left its domain, and
 clipping hides that rather than fixing it. Ship the exact form; comment that it
-reduces to the linear one in the tight regime, with `n_eff ≈ 1.34·√(E_tot/Kd)` as
-the validity diagnostic. Decision 006 promoted.
+reduces to the linear one in the tight regime, with `n_eff` as the validity
+diagnostic. Decision 006 promoted. **Follow-up correction (2026-08-15, on first
+integration):** the diagnostic's prefactor is **0.5**, not the derivation's 1.34 —
+that value belongs to the deleted two-target ternary complex, and reusing it would
+have overstated threshold sharpness ~2.7× and inflated R1 with it. See 006.
 
 **5 · The guard test is the flagship.** *"`dR/dt` has no P-independent term"* is
 the bootstrap claim expressed as a zero, and violating it would run clean while

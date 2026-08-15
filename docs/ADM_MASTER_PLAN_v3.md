@@ -209,10 +209,16 @@ Items **3** and **8** are the ones to chase hardest: 3 is the only input to the 
 **`E_free`: use the exact solution, cite the derivation.** Linear subtraction is what two-target titration reduces to when `Kd ≪` the protein totals: in that limit each ID3 molecule takes one E molecule 1:1, so `E_free → E_total − k·ID3`. That makes it the **ultrasensitive** limit, not a soft approximation — but it is only valid inside its domain, and a `max(0, ·)` floor is a hack that hides the domain violation rather than fixing it. Use the exact form from `docs/derivations/binding_polynomial.md` (already derived, previously written for a cut stage) and state in the code comment that it reduces to the linear form in the tight regime, with
 
 ```
-n_eff ≈ 1.34·√(E_tot/Kd)        the diagnostic for when the approximation holds
+n_eff ≈ 0.5·√(E_tot/Kd)         the diagnostic for when the approximation holds
 ```
 
-as the check. No invalid region, no floor, and the derivation earns its keep. **This also matters downstream:** Phase 3 convolves the per-cell dose distribution against this threshold, and a soft threshold and a sharp one give different converted fractions — which is the headline number.
+as the check. No invalid region, no floor, and the derivation earns its keep.
+
+> **Correction, 2026-08-15, found on first integration of the core.** This line originally read `1.34·√(E_tot/Kd)`, carried over from `docs/derivations/binding_polynomial.md` §6. **That constant does not apply to the shipped mechanism.** It was derived for the deleted 11-state model's *ternary complex* under *two-target* titration (ID3 taxing both PTF1A and E-protein, so the log-log slope compounded). The Phase 2 core titrates one target, and the measured prefactor on `E_free` is **0.5**. Carrying 1.34 across that change of mechanism would have overstated threshold sharpness by ~2.7×.
+
+**Why that matters downstream, and why it was worth catching:** Phase 3 convolves the per-cell dose distribution against this threshold, and a sharper threshold produces a **larger co-formulation gap — the headline number of the entire project**. An inherited constant would have inflated R1 by ~2.7× while the model still ran and the figure still rendered.
+
+**Open item for Phase 3:** the quantity actually convolved is the *complex* threshold `P·E_free·R`, not `E_free` alone, and its sharpness compounds `n_P`/`n_R` on top of the binding term. **Phase 3 must define sharpness on the quantity it convolves and measure it there**, rather than reusing either constant.
 
 **pERK on withdrawal: a swept rebound profile, not a step.** Trametinib sets pERK while present. When it is withdrawn, pERK does not jump instantly to baseline; it recovers on its own timescale, with a possible overshoot from relief of ERK-mediated negative feedback on RAF. Because the primary endpoint of this whole plan is *what happens after withdrawal*, that recovery shape is not a detail — it sets how hard the system is pushed back toward the metaplastic basin at exactly the moment durability is being tested.
 

@@ -27,12 +27,30 @@ in the code comment that it reduces to `E_total − k·ID3` in the tight regime,
 with
 
 ```
-n_eff ≈ 1.34·√(E_tot/Kd)          derivation §6 — the validity diagnostic
-n_eff → 2                          derivation §5 — the loose limit
+n_eff ≈ 0.5·√(E_tot/Kd)           tight limit, MEASURED on the shipped 1:1 form
+n_eff → 1                          loose limit
 ```
 
 as the check on which regime a given sample is actually in. No invalid region, no
 hack.
+
+> **Correction, 2026-08-15 — the constant below is not transferable, and this is
+> the amendment's most important line.** The table further down measures
+> `n_eff ≈ 1.34·√(E_tot/Kd)` and `n_eff → 2`. Both are correct **for what they
+> measured**: the log-log slope of the *ternary complex* `C_L` under *two-target*
+> titration, where ID3 taxes PTF1A and E-protein through two multiplied factors —
+> which is exactly why the loose limit is 2 rather than 1.
+>
+> The Phase 2 core titrates **one** target and takes the diagnostic on `E_free`
+> itself. Measured against the shipped closed form: prefactor **0.5**, loose limit
+> **1**. Carrying 1.34 across the change of mechanism overstates threshold
+> sharpness by ~2.7×, and since Phase 3's co-formulation gap grows with sharpness,
+> it would have inflated **R1 — the project's headline number** — by that factor,
+> silently. Found on the first integration of `src/core.py`, not by reading.
+>
+> Generalisation worth keeping: **a constant measured on one observable of one
+> mechanism is not a property of "the model".** When the mechanism changes,
+> re-measure rather than re-cite.
 
 **Consequence 2 — the ultrasensitivity result now feeds Phase 3, the headline.**
 Phase 3 convolves the per-cell LNP dose distribution against the P–R bootstrap
@@ -51,6 +69,38 @@ survives for that reason; its Stage 2 framing does not.
 **What does NOT survive:** T1-vs-T2 as competing topologies, the Q-value
 comparison, and `first_order_sequestration` as a rival mechanism to be beaten.
 The first-order sink is now simply a wrong limit, not a candidate.
+
+### One `K_d`, and how the extrapolation gets checked
+
+The core titrates **one** target with a closed form, where the deleted model
+sampled `K_IE` and `K_IP` independently. Two independent reasons that suffices:
+
+1. **Rank order.** Langlands 1997 (PMID 9242638) found all three Ids bind
+   E-proteins with high affinity while Id3 interacts *weakly* with class B
+   factors. **PTF1A is class B**, so the E47 arm should dominate.
+2. **Mechanism.** The E47 arm is load-bearing even in Dufresne 2010, because
+   **E47 carries nuclear import of the PTF1 complex** — that is the pathway the
+   mislocalization phenotype actually runs through.
+
+**But PTF1A was not in the Langlands panel.** That is an extrapolation, and **a
+single sensitivity point cannot tell you whether an extrapolation matters** — it
+tells you about one point. So the check is a **range sweep across the full span
+from the Langlands rank order (E47 tight, PTF1A weak) to parity (both equal)**:
+
+- **stable across the entire span** → one `K_d` is justified, and the sweep is the
+  reason, stated rather than asserted;
+- **moves anywhere in the span** → the second `K_d` comes back, **and the location
+  of the flip is itself the finding** — it says how much asymmetry the conclusion
+  can tolerate, which is more informative than either answer alone.
+
+`src/supplementary/binding.py` is retained to run exactly this check; it is the
+only implementation of the two-target mechanism.
+
+### The prefactor does not transfer — see the correction box above
+
+`n_eff` for the core is `0.5/√κ`, measured. The 1.34 below belongs to the ternary
+complex under two-target titration. Reusing it would inflate Phase 3's
+co-formulation gap — **R1, the headline number** — by ~2.7×.
 
 ---
 

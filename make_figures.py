@@ -17,7 +17,7 @@ Each figure lives in `figures/figNN_<topic>.py` and exposes:
 is not in `results/`, the fix is a stage that writes it — not a solve in the
 figure. That is what keeps this command under a minute, keeps figures from
 drifting out of step with the analysis, and stops a slow stage from blocking a
-figure. A figure module that imports `src.model` is a bug.
+figure. A figure module that imports `src.core` is a bug.
 
 Missing inputs are a SKIP, never a crash: early in the project most stages have
 not run, and a build that dies on the first absent result file is a build nobody

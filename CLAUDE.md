@@ -29,13 +29,13 @@ decoration).
 
 ## Layout
 
-**Committed:** `src/` model + analysis · `scripts/` runnable entry points ·
-`prereg/` ranges + predictions written *before* runs · `figures/` `_style.py`,
-`_provenance.py`, one module per figure, with `out/` holding final PDFs +
-`_source.csv` + `.prov.json` · `docs/decisions/` one file per architectural
-decision · `tests/golden/` pre-rewrite regression fixture (**arbitrary parameters —
-report no number from it**).
-**Gitignored:** `data/` `results/` `logs/` `build/`.
+**Committed:** `src/core.py` the 3-state model · `src/supplementary/` kept, not part
+of the core · `scripts/` entry points · `prereg/` ranges + predictions written
+*before* runs · `figures/` `_style.py`, `_provenance.py`, one module per figure,
+`out/` holding final PDFs + `_source.csv` + `.prov.json` · `docs/decisions/` one file
+per architectural decision · `tests/golden/` pre-rewrite fixture (**arbitrary
+parameters — report no number from it**). **Gitignored:** `data/` `results/`
+`logs/` `build/`.
 
 ## Phases — Part 2. Phase 1 runs parallel to Phase 2.
 
@@ -60,20 +60,25 @@ under compression:** 6 → Phase 4's simplex interior → Phase 5's ordering arm
 
 ## The Phase 2 model — 3–4 states, not thirteen
 
-- `P` PTF1A activity, autoregulatory, requiring an E-protein partner
-- `R` RBPJL, produced **only** as a function of `P`. **No P-independent term — that
-  zero *is* the bootstrap claim.**
+- `P` PTF1A, autoregulatory via PTF1-L (**RBPJL**), needs an E-protein partner,
+  plus ERK-suppressed basal ignition — **without which `P = 0` is absorbing too**
+- `R` RBPJL, from PTF1-J (**RBPJ**, constant pool). **No P-independent term — that
+  zero *is* the bootstrap claim.** *Nothing but PTF1A makes RBPJL* — **not** *nothing
+  but RBPJL makes RBPJL*: that is stronger, unsupported, makes `R = 0` absorbing, and
+  contradicts Collins. It also passes every guard test.
 - `C` slow chromatin/memory at metaplasia loci — sets time-to-relapse
-- `E_free` from the **exact** binding solution, `ID3 = f(pERK)` — algebraic, not
-  differential. `E_total − k·ID3` is its tight-binding limit and goes negative
-  outside its domain; **no floor hack** — ship the exact form, check validity with
-  `n_eff ≈ 1.34·√(E_tot/Kd)` (decision 006).
+- `E_free` from the **exact** binding solution, `ID3 = f(pERK)` — algebraic. The
+  linear `E_total − k·ID3` is its tight limit, negative outside its domain; **no
+  floor hack.** Sharpness **`n_eff ≈ 0.5/√κ`, measured on the shipped form** — the
+  derivation's 1.34 is the *deleted* two-target complex; re-citing it overstates
+  sharpness ~2.7× and inflates R1.
 - **pERK is an input, not a state — and on withdrawal it is not a step.** It follows
   a prescribed **rebound profile**, swept over its shape, measured by bench item 7.
   Withdrawal *is* the endpoint, so the recovery shape is mechanism (002 amendment).
 - **Viability is measured at the bench, not modelled** (008 retired). One survivor,
   a flag not a term: warn when predicted `P` drops below the CHOP threshold.
-- Profile likelihood on the three key parameters. **Not** an FIM eigenspectrum.
+- Profile likelihood on `a_P`→R2, `γ`→R3, `κ`→R1 — **it is the uncertainty on each
+  deliverable**, not an identifiability side-quest. **Not** an FIM eigenspectrum.
 - **Flagship guard test:** *`dR/dt` has no P-independent term* — as a
   guard-on-the-guard (construct the violating version, require it to fail), plus a
   dynamic companion: `R` must not rise from zero while `P` is held at zero.
@@ -83,8 +88,7 @@ under compression:** 6 → Phase 4's simplex interior → Phase 5's ordering arm
 **1. Pre-registration before any sweep or fit.** Ranges to
 `prereg/<date>_<name>_ranges.yaml`, prediction to `prereg/<date>_<name>_prediction.md`,
 **commit and push**, then run — the pushed timestamp is the proof. **I write the
-templates; Luqmaan writes the content — never fabricate his predictions.** Asked to
-skip this: refuse and say why.
+templates; Luqmaan writes the content.** Asked to skip this: refuse and say why.
 
 **2. Nothing large or secret in git.** Fetch datasets by accession with an idempotent
 script — the script is the artifact. Public repo: no tokens, no `.env`.
@@ -108,14 +112,14 @@ retired, not shelved; an unretired claim is one someone builds on later.
 
 ## ⚠ STANDING RULE — never silently drop a failed solve
 
-**Silently dropped failures are the single easiest way for this project to produce
-a confident wrong answer**, because failures *correlate with swept parameters* —
-drop them and the sample set is depleted precisely in the regime the sweep was
-built to probe, which looks like a clean negative. So everywhere a solve happens
-(continuation, root-finding, profile likelihood, Phase 3's Monte Carlo): **log every
-outcome**; **report failure rate as a function of every swept parameter, never as a
-scalar**; **if it correlates, say so in the writeup** and treat results as
-*conditional on convergence*; **keep a test sweeping the hard regime**, bound <1%.
+**Silently dropped failures are the easiest way to produce a confident wrong
+answer**, because failures *correlate with swept parameters* — drop them and the
+sample set is depleted precisely in the regime the sweep was built to probe, which
+looks like a clean negative. Everywhere a solve happens (continuation, profile
+likelihood, Phase 3's Monte Carlo): **log every outcome**; **report failure rate as
+a function of every swept parameter, never as a scalar**; **if it correlates, say
+so** and treat results as *conditional on convergence*; **keep a test sweeping the
+hard regime**, bound <1%. The core's binding step is closed-form and exempt.
 
 ## ⚠ STANDING RULE — figure modules never compute science
 
@@ -128,8 +132,7 @@ figures cannot drift from the analysis, and a slow stage never blocks a figure.
 - **General-purpose geometry. No IEEE or conference-template sizing** — one `SCALE`
   in `figures/_style.py`, scaled downstream by Luqmaan.
 - Okabe–Ito, **four nominal colours**: `#0072B2` acinar · `#D55E00` metaplastic ·
-  `#009E73` intervention/success · `#6E6E6E` toxic — **grey, not red** (green/red is
-  the textbook deuteranopia collision).
+  `#009E73` intervention · `#6E6E6E` toxic — **grey, not red** (deuteranopia).
 - `rc_context`, never a bare rcParams mutation — one process imports every module.
   `savefig.bbox="standard"` **not** `"tight"` (tight silently resizes, breaking width
   checks). `pdf.fonttype 42`, `svg.fonttype "none"`.
@@ -140,7 +143,7 @@ figures cannot drift from the analysis, and a slow stage never blocks a figure.
 - **Traps:** no 3-D cusp surface · no hairball of all states · no continuous colormap
   under a three-class map · no fake error bars on deterministic output · no p-value
   without sampling · no truncated percentage axis · no bimodality from a KDE shape ·
-  two significant figures unless you can defend more.
+  two significant figures unless defensible.
 
 ## Cut — do not re-propose. Reasons in Part 4 and decision 012.
 
@@ -156,44 +159,41 @@ decision; replaced by constrained optimization + therapeutic index) · **U-shape
 viability hazard as an ODE** · **trametinib-vs-PD325901 asymmetry** · **Gillespie
 bimodality vs scRNA-seq** · **CellOracle as validation** (keep as a *declared
 negative control*) · **Enformer/Borzoi · AlphaFold→k_on · Perturb-seq · one-sided
-U_crit · structural/Kalman controllability · full-dimension HJ reachability · MPC ·
+U_crit · structural/Kalman controllability · full-dim HJ reachability · MPC ·
 all-atom MD**. To revisit one, argue it in `docs/decisions/`. Don't just start.
 
 ## Standing limitations — state these before anyone asks
 
-- **The prioritization is a positive control, not a discovery.** Say it on the poster.
 - **A regulon screen is blind to post-translational mechanisms.** TCF3/E47 is not
-  transcriptionally lost — it is titrated — so no threshold surfaces it; it enters by
-  **declared mechanism, registered before the screen runs.**
+  transcriptionally lost, it is titrated — so no threshold surfaces it; it enters
+  by **declared mechanism, registered before the screen runs.**
 - **ID3 titration is DOCUMENTED in this cell line. The gap is one edge: ERK→ID3.**
   Dufresne 2010 (PMID 20830706), *in AR4-2J*: Id3 binds both E47 and Ptf1-p48, those
   interactions rise while E47/Ptf1-p48 falls, silencing Id3 reverses the
-  mislocalization, and the pattern holds in human/murine preneoplastic lesions.
-  Its driver is **gastrin** — that KRAS/ERK drives ID3 is the inference, testable in
-  one western (bench item 8). **No Kd** is measured. Do not disclaim the node
-  itself; v3.1 Part 1.4 is the corrected wording.
+  mislocalization, pattern holds in human/murine lesions. Its driver is **gastrin**
+  — that KRAS/ERK drives ID3 is the inference, testable in one western (bench item
+  8). **No Kd** measured. Don't disclaim the node; v3.1 Part 1.4 is the wording.
 - **PTF1A is pleiotropic** and dosage-sensitive (PMID 30470852). "Preserving
   viability" does not cover "did not make a neural-program-expressing cell" —
   **lineage fidelity is a separate endpoint.**
 - **Converted cells often fail to silence the starting program** (CellNet, PMID
-  25126793) — hence the ADM-repressor axis.
-- **AR42J needs dexamethasone** to express amylase at a differentiated level at all;
-  without baseline and dynamic range, falsification power is unknown. **Its *Kras*
-  genotype is unverified.** Both week-1 blocking. **Reference data is mouse/human;
-  the bench is rat, and a transformed line** — argue the transfer, don't assume it.
-- **No measured PTF1A half-life, no Hill coefficient, no Kd for any ID3 interaction,
-  no prior ODE model of ADM** — sampled with stated priors, never fitted points.
+  25126793) — hence the ADM-repressor axis. **The prioritization is a positive
+  control, not a discovery.**
+- **AR42J needs dexamethasone** to express amylase at all; without baseline and
+  dynamic range, falsification power is unknown. **Its *Kras* genotype is
+  unverified.** Both week-1 blocking. **Reference data is mouse/human; the bench is
+  rat, and transformed** — argue the transfer, don't assume it. **No measured PTF1A
+  half-life, no Hill coefficient, no Kd for any ID3 interaction, no prior ODE model
+  of ADM** — sampled with stated priors, never fitted points.
 
-## Framing — Part 6
+## Framing — the rest is v3 Part 6
 
 Category **CBIO**. **Frame the wet lab as computation-that-designed-an-experiment,
-never as validation** — claim validation, get a negative, and your conclusion is
-deleted. Dated prediction box **left of** the outcome box; pre-specified
-interpretation table; **effect size and pre-registered direction, never a
-p-value**. Bound what it can falsify: ordering and timing yes, dose no.
+never as validation** — claim validation, get a negative, conclusion deleted.
+**Effect size and pre-registered direction, never a p-value.** Bound what it can
+falsify: ordering and timing yes, dose no.
 
 ## Environment
 
-`venv\Scripts\activate`, `pip install -r requirements.txt`. Stack: `numpy scipy
-matplotlib pandas sympy casadi SALib h5py anndata scanpy`. Continuation is hand-rolled
-pseudo-arclength on 3–4 states; no PyDSTool or AUTO-07p without a decision writeup.
+`venv\Scripts\activate`, `pip install -r requirements.txt`. Continuation is
+hand-rolled pseudo-arclength on 3 states; no PyDSTool or AUTO-07p without a writeup.

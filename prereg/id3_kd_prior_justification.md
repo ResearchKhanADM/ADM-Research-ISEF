@@ -38,6 +38,13 @@ K_d ≫ totals  →  n_eff → 2          identical to a first-order sink (§5)
 K_d ≪ totals  →  n_eff ≈ 1.34·√(totals/K_d)   unbounded as K_d falls (§6)
 ```
 
+> **Both numbers above are specific to the two-target ternary complex `C_L` that
+> this file was written for, and neither transfers to the Phase 2 core**, which
+> titrates one target and takes the diagnostic on `E_free`: prefactor **0.5**,
+> loose limit **1**. The *scaling* — `√(totals/K_d)`, unbounded as `K_d` falls —
+> is what survives, and it is the part this file's argument actually rests on.
+> Correction made 2026-08-15; see decision 006's amendment.
+
 In the loose limit **T1 and T2 are the same model** — not similar, the same.
 So a prior that sits entirely in the loose regime guarantees a null result, and
 the null would be a property of the prior rather than of the biology.

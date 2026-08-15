@@ -443,3 +443,126 @@ instead of two, `n_C` possibly removable (→ 10 groups), `A` not a state, and
    partners, and it costs a parameter out of a budget of eleven.
 3. **Arm budget** — still an external unknown. Placeholder 12/24/48 is now written
    into v3 Phase 0, and Phase 4's design must be instantiable at each tier.
+
+---
+
+## 2026-08-15 · Session 5 — the Phase 2 core exists
+
+Guard test written **before** the right-hand side, as instructed. The old model is
+deleted in the same commit as its replacement. 38 tests pass.
+
+### The pre-registration discipline paid, and it is worth being able to point at
+
+`prereg/id3_kd_prior_justification.md` was written for **Stage 2 of a plan that no
+longer exists**. It stated that nondimensionalization *should* surface
+`K_d/E_tot` as a single dimensionless group, and that **if it did not, the
+nondimensionalization was wrong.** Two plan rewrites later, on a model with a
+different state space, a different mechanism and a different purpose — it does,
+as group 12, and it is one of the three profiled parameters.
+
+A structural prediction, recorded in advance, that survived a full architecture
+change and came true. That is small, but it is evidence the pre-registration rule
+is doing real work rather than being ceremony, and it is the kind of thing that is
+much more convincing when you can point at the commit timestamp.
+
+### Two things the right-hand side caught that the parameter table could not
+
+**1 · The two complexes are not one complex.** The first draft wrote *Rbpjl*
+production against the PTF1-**L** complex — i.e. RBPJL production requiring RBPJL.
+That makes `R = 0` **absorbing**, so no amount of MEK inhibition can restore it and
+**the model predicts trametinib alone never reverts anything.** That contradicts
+Collins 2014 head-on and would have destroyed Phase 7's trametinib-only positive
+control — the arm that makes the one-shot experiment un-failable.
+
+The fix is the biology: *Rbpjl* is driven by PTF1-**J** (with **RBPJ**, broadly
+expressed, constant pool absorbed into `a_R` at no parameter cost); the *Ptf1a*
+enhancer needs PTF1-**L** (with **RBPJL**). Stated precisely, because the two are
+one word apart and only one is defensible:
+
+> The claim is **"nothing but PTF1A makes RBPJL"** — **not** "nothing but RBPJL
+> makes RBPJL". The second is stronger, unsupported, **and it passes every guard
+> test**.
+
+A missing basal ignition term `b_P` fell out of the same check, for the same
+reason. Below `b_P ≈ 0.4` the model is in a regime the literature already rules
+out, so `default_params` sits above it — a sanity floor, not a calibration.
+
+**2 · The `n_eff` prefactor is 0.5, not 1.34 — and this one had a price tag.**
+The 1.34 was measured on the *deleted* model's ternary complex under *two-target*
+titration. The core titrates one target and takes the slope on `E_free`: measured
+**0.5**, loose limit 1 rather than 2. **Phase 3 convolves the per-cell LNP dose
+distribution against this threshold, so carrying 1.34 over would have inflated the
+co-formulation gap — R1, the headline number — by ~2.7×, silently.** The model
+would still run; the figure would still render.
+
+It had propagated into five documents (CLAUDE.md, v3, decisions 006 and 012, the
+Kd prereg). All corrected, each with the reason rather than a silent edit.
+Generalisation now written into 006: **a constant measured on one observable of
+one mechanism is not a property of "the model" — when the mechanism changes,
+re-measure rather than re-cite.**
+
+### Done
+
+- **`tests/test_bootstrap_guard.py` first, then `src/core.py`.** Seven guard tests:
+  the structural claim, an exact-zero check at the origin, **two
+  guards-on-the-guard** (a naive `+1e-6` basal term *and* a subtler
+  offset-inside-the-Hill version, both of which the guard must catch), the dynamic
+  companion (`R` cannot rise from zero with `P` clamped at zero, ERK swept from
+  fully suppressed to high), a collapse test, and a positive control that the
+  payload can still raise `R` — without which a model where `R` is simply inert
+  would pass everything.
+- **Budget: 12 free groups**, not the 11 signed off. Two were missed by counting
+  on paper: `k_w` (the pERK scale was already spent on ID3, so a second
+  ERK-driven process needs its own half-max) and `b_P` (a missing *mechanism*, per
+  above). `n_C = 1` on the double-counting argument brings it back inside v3's
+  9–12. **Margin is 12 of 12 — any new term must displace an existing one**, and
+  `tests/test_core.py` asserts the count so it cannot creep.
+- **Qualitative structure confirmed against the golden fixture.** Two attractors,
+  metaplastic branch at `R ≈ 0` — the same signature as the pre-rewrite fixture,
+  across a complete change of state space. The bistable region is a **bounded
+  window**: monostable *acinar* below it (trametinib alone reverts — Collins),
+  monostable metaplastic above it. Withdrawal relapses. That is the R3 structure.
+- **Deletions, same commit as the replacement:** `model.py`, `topology.py`,
+  `functional_forms.py`, `payload_subsets()`, `pin_golden_trajectory.py` (it
+  imported the deleted modules; the fixture and its full parameter set are
+  committed, and git history holds the script). `binding.py` → `src/supplementary/`,
+  with its surviving tests.
+- Calls 1–4 written into `docs/PHASE2_PARAMETER_BUDGET.md` and decision 006,
+  including the **range-sweep** design for the one-`K_d` check.
+
+### Broke
+
+- Three tests failed on first run, all of them usefully: the parameter count (13
+  fields, 12 free), the `n_eff` constant (above), and the bistability test, which
+  had been written against low ERK before `b_P` moved the low-ERK regime to
+  monostable acinar. All three were wrong assertions, not wrong code.
+- **Nothing was tuned to make a result appear.** The payload-rescue question — can
+  a payload prevent relapse — was explored, found to depend on drug-hold duration
+  relative to `γ`, and **left alone**: that is a Phase 5 result and it needs
+  pre-registration before it is swept, not a parameter set chosen until it looks
+  right. Recorded here so the restraint is auditable.
+
+### Next
+
+1. **Gate B.** Continuation on `(KRAS × trametinib)`, the persistence window as a
+   bounded wedge, saddle and separatrix identified properly rather than by
+   settling from two initial conditions.
+2. **Profile likelihood on `a_P`, `γ`, `κ`** — and report each as the uncertainty
+   on R2, R3, R1 respectively, in those words.
+3. **The one-`K_d` range sweep**, Langlands rank order → parity.
+4. `fig01_loop_schematic` and `fig02_persistence_window` as soon as Gate B writes
+   to `results/`.
+
+### Open questions
+
+1. **`ε` / `α_C` separability** — decided by profile likelihood, not in advance. If
+   they lump, report 11 groups and name the combination.
+2. **The observation model for `A`** (Phase 0). Three parts agreed: minimal spread
+   propagated then thresholded; staining threshold as a **sampled nuisance
+   parameter**; Phase 6 targets framed as **timing** rather than absolute
+   percentages. **Build it once — Phase 3 needs the same per-cell spread machinery
+   for LNP dose heterogeneity.**
+3. **Arm budget** — unchanged, external, blocking Phase 4 only.
+4. **Bench item 8** (ID3 western ± trametinib) — Luqmaan chasing this week. It
+   tests the ERK→ID3 edge, the one assumption Phase 5's ordering prediction rests
+   on.

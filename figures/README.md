@@ -19,7 +19,7 @@ a number that is not in `results/`, the fix is a stage that writes it.
 
 Consequences: rebuild is always under a minute, figures cannot drift from the
 analysis, and a slow stage never blocks a figure. A figure module that imports
-`src.model` is a bug.
+`src.core` is a bug.
 
 ## Writing one
 
