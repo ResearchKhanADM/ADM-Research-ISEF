@@ -154,7 +154,7 @@ Write the full system, then **nondimensionalize and adiabatically eliminate the 
 
 | Symbol | Meaning | Timescale |
 |---|---|---|
-| `P_n` | PTF1A, nuclear **free** (ID3-bound and complexed pools are derived) | slow |
+| `P_n` | **total** nuclear PTF1A (free, ID3-bound and complexed pools are derived from it) | slow |
 | `R` | RBPJL protein | **slow — the bottleneck** |
 | `E_tot` | **total** E-protein (E47/HEB) — synthesis, degradation, and the `u₃=E47` input | **slow** |
 | `I` | ID3 | intermediate → leading QSS candidate at reduction |
@@ -189,7 +189,7 @@ dP_n/dt = α_ign·g(K_eff) + α_auto·Hill(C_L, M; n) − δ_P·P_n + u₂(t)
 ```
 `α_ign·g(K_eff)` is the 13.4-kb ignition, suppressed by ERK, released by trametinib — note it takes `K_eff`, which already carries the drug through `W` and `f_cat`, so writing `g(K,v)` here would double-count it. `α_auto·Hill(·)` is the 2.3-kb autoregulatory enhancer.
 
-> ⚠ **The term `− k_seq·I·P_n` was here and has been deleted. Do not restore it.** It is a first-order sink, which §3.4's constraint 2 forbids and which this section's own titration paragraph calls out as generating no ultrasensitivity. **Sequestration has not been removed — it has been moved into the binding polynomial below**, where PTF1A and E partition through one shared competitive equilibrium. `P_n` here is *free* nuclear PTF1A; the ID3-bound and complexed pools are derived, not integrated.
+> ⚠ **The term `− k_seq·I·P_n` was here and has been deleted. Do not restore it.** It is a first-order sink, which §3.4's constraint 2 forbids and which this section's own titration paragraph calls out as generating no ultrasensitivity. **Sequestration has not been removed — it has been moved into the binding polynomial below**, where PTF1A and E partition through one shared competitive equilibrium. `P_n` is the **total** nuclear PTF1A pool, exactly parallel to `E_tot`; free PTF1A, ID3·PTF1A and the complexed pools are all derived from it, never integrated.
 
 **RBPJL — the asymmetry that makes the system interesting**
 ```
