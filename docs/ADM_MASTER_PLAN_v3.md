@@ -3,9 +3,18 @@
 
 > ## ⚠ READ FIRST
 >
-> **This replaces `ADM_INSILICO_MASTER_PLAN.md`, `INSILICO_PLAN_v2.md`, and `INSILICO_PLAN_8months.md`.** Delete them. If any file on this machine still describes a seven-stage pipeline, a five-way topology competition, a 2^k subset enumeration, or a Lie-bracket ordering analysis, it is obsolete.
+> **This replaces `ADM_INSILICO_MASTER_PLAN.md`, `INSILICO_PLAN_v2.md`, and `INSILICO_PLAN_8months.md`.** They have been deleted. If any file on this machine still describes a seven-stage pipeline, a five-way topology competition, a 2^k subset enumeration, or a Lie-bracket ordering analysis, it is obsolete.
 >
 > A three-reviewer panel found four problems that the previous plan could not survive. All four are recorded in Part 0 with the evidence. Read Part 0 before Part 1 — it explains why the project changed shape.
+
+> ## AMENDMENTS — v3.1, 2026-08-15
+>
+> Four changes, made after auditing v3 against the existing repo. Each is recorded in `docs/decisions/012-durability-framing-architecture-change.md`; the affected sections below are edited in place rather than appended to, so this file stays the single plan of record.
+>
+> 1. **§2 Phase 2 — pERK is still an input, but no longer a step.** On withdrawal it follows a prescribed, swept **rebound profile**. v3's spine is durability *after withdrawal*, and pERK rebound is a withdrawal-specific mechanism; deleting it silently would have deleted the thing most relevant to the new endpoint. This converts an unmeasured state into a **measured input** — a pERK western timecourse after washout — which is the move this plan makes everywhere else. **Bench Handshake #1 gains that timecourse.**
+> 2. **§1.4 — the ID3 limitation was too broad and is rewritten.** Dufresne 2010 (PMID 20830706) *does* document the two-target node, in AR4-2J. The real gap is one edge: **ERK→ID3**. **Bench Handshake #1 gains an ID3 western ± trametinib**, which is cheap and decides whether Phase 5 means anything.
+> 3. **§2 Phase 2 — `E_free` uses the exact binding solution, not the linear approximation.** `E_total − k·ID3` is the *tight-binding limit* of the exact form and goes negative outside its domain. The derivation already exists (`docs/derivations/binding_polynomial.md`); it becomes this plan's justification rather than dead work.
+> 4. **Viability is a bench-measured floor, not a modelled hazard.** The U-shaped hazard is retired (decision 008 amendment). One thing is kept as an **output flag, not a term**: if the model predicts `P` below the CHOP-apoptosis threshold, say so on the output.
 
 ---
 
@@ -123,7 +132,17 @@ Everything else in the plan is in service of these three.
 
 - **The prioritization is a positive control, not a discovery.** Say it on the poster.
 - **A regulon screen is blind to post-translational mechanisms.** TCF3/E47 is not transcriptionally lost — it is titrated by ID3 — so no threshold will make it appear. It enters by **declared mechanism**, registered before the screen runs. That is not an excuse; it is a correct statement about two instruments with disjoint blind spots, and it is the strongest argument that both arms are needed.
-- **The ID3→E47 titration node in pancreatic ADM is a modelling hypothesis, not a documented mechanism.** Targeted PubMed search returned no evidence for it in this specific context. The general Id/E-protein sequestration mechanism is well documented; the pancreatic instance is not. **Label it as the hypothesis the ordering experiment tests.**
+- **The ID3 titration node is documented in this cell line. The load-bearing gap is one edge: ERK→ID3.** *(Corrected 2026-08-15 — the previous text said targeted search returned no evidence in the pancreatic context. That was too broad, and it would have had this project disclaiming published work on the poster. Verified against PubMed.)*
+
+  **Documented** — Dufresne et al. 2010, *Int J Cancer* 129(2):295–306, PMID 20830706, doi 10.1002/ijc.25668, *"Id3 modulates cellular localization of bHLH Ptf1-p48 protein"*, **in AR4-2J**: Id3 binds **both** E47 and Ptf1-p48; a proliferative signal raises Id3 and raises Id3/E47 **and** Id3/Ptf1-p48 while E47/Ptf1-p48 **falls**; **silencing Id3 reverses the cytoplasmic mislocalization**; and the pattern — Id3 overexpressed, Ptf1-p48 absent or mislocalized — holds in **human and murine preneoplastic lesions**. E47 carries nuclear import of the PTF1 complex, which is the stated mechanism of the mislocalization.
+
+  **Not documented** — any **Kd** for either interaction. Unchanged, and it is why binding affinities are sampled across decades rather than fixed.
+
+  **Assumed, and this is the load-bearing gap** — **that ERK drives ID3.** Dufresne's driver is **gastrin**. The ERK→ID3 edge is an inference, not a measurement.
+
+  **Why it matters where it matters:** Phase 5's ordering prediction lives on exactly that edge. If trametinib does not lower ID3 in these cells, trametinib-first loses its mechanistic basis. That is a **one-western experiment** — ID3 by western, ± trametinib, in our cells — and it is on Bench Handshake #1 as high-value. Net: the prediction is **better supported than v3 originally claimed**, and the residual uncertainty is one edge rather than the whole node. Say it that way.
+
+- **Viability is measured at the bench, not modelled.** The old U-shaped death hazard is retired (decision 008 amendment): its parameters were never measurable, ER-stress dynamics were the least-constrained part of the old model, and the bench measures viability directly. Modelling something you can measure, with parameters you cannot, is backwards. **Kept as an output flag, not a term:** if the model predicts `P` below the CHOP-apoptosis threshold, surface it as a warning. The low-PTF1A arm is real biology (Sakikubo 2018, PMID 30361559); it does not need to be a differential equation.
 - **PTF1A is pleiotropic.** It reprograms fibroblasts into tripotential neural stem cells, and is dosage-sensitive in both pancreas and cerebellum (PMID 30470852). "Preserving viability" does not cover "did not create a neural-program-expressing pancreatic cell." Lineage fidelity is a separate endpoint.
 - **Converted cells often fail to silence the starting program** (CellNet, PMID 25126793). The candidate list is all *turn acinar back on* and needs an **ADM-repressor axis**.
 - **AR42J requires dexamethasone to express amylase at a differentiated level at all.** Baseline PTF1A/RBPJL and the achievable dynamic range must be measured, or the experiment's falsification power is unknown.
@@ -142,7 +161,28 @@ Eight phases, ~18 weeks of work. Dependencies and gates stated. Phase 1 runs par
 
 **Why first.** The previous plan optimized before knowing how many wells exist — which is how you end up with a 256-point Pareto front and twelve wells. Every downstream design decision is a function of the arm budget.
 
-**Also issue Bench Handshake #1 now**, because these have long lead times and the model needs them at Phase 3: Kras genotype; ADM stability to ≥14–21 days; trametinib IC50 in *these* cells; **LNP transfection efficiency and its cell-to-cell CV**; mRNA half-life in AR42J/Matrigel; baseline PTF1A/RBPJL by qPCR ± dex.
+**The arm budget is a blocking EXTERNAL input, not a modelling choice** *(amended v3.1)*. It depends on the wet lab and is not known yet. Do not guess it and do not let it block Phases 2–3, which do not depend on it. Instead:
+
+- put an explicit **placeholder range in the decision spec — 12 / 24 / 48 wells** — and
+- build Phase 4's mixture-amount design so it can be **instantiated at any tier**, and
+- **state what changes at each tier**, so the number can be argued for rather than accepted.
+
+A design that degrades gracefully across tiers is worth more than one that is optimal at a well count nobody has confirmed.
+
+**Also issue Bench Handshake #1 now** — these have long lead times, and Phase 3 cannot run without them. **All items are blocking.**
+
+| # | Item | Blocks | Note |
+|---|---|---|---|
+| 1 | *Kras* genotype — sequence codons 12/13, 61 | the forcing term | highest-stakes unknown in the project |
+| 2 | Trametinib IC50 in *these* cells | Phase 2 drug axis, Phase 5 | a published IC50 from another line sets the wrong axis origin |
+| 3 | **LNP transfection efficiency AND its cell-to-cell CV** | **Phase 3 ★** | the CV *is* the x-axis of the headline figure; a mean without a spread cannot produce the result |
+| 4 | mRNA half-life in AR42J / Matrigel | Phase 5 redosing axis | 3D is not 2D; a plastic-dish number is a different number |
+| 5 | Baseline PTF1A/RBPJL by qPCR ± dex | Phase 2 ICs, Gate A | without dynamic range, a null is unreadable: "payload failed" or "no room to move" |
+| 6 | ADM stability to ≥14–21 days | Phase 5 durability endpoint | no contrast if the state does not hold unassisted |
+| 7 | **pERK western timecourse after trametinib washout** | **Phase 2 input, Phase 5 ★** | *added v3.1.* Supplies the rebound profile directly instead of sampling its shape — converts an unmeasured state into a measured input |
+| 8 | **ID3 by western, ± trametinib** | **Phase 5 — decides whether it means anything** | *added v3.1.* **High value, one western.** Tests the ERK→ID3 edge, the single assumption Phase 5's ordering prediction rests on. If trametinib does not lower ID3 here, trametinib-first loses its mechanistic basis |
+
+Items **3** and **8** are the ones to chase hardest: 3 is the only input to the strongest result and no literature value substitutes for it; 8 is cheap and decides the fate of a whole phase.
 
 ## PHASE 1 · Candidate generation — 2 weeks · parallel with Phase 2
 
@@ -163,8 +203,24 @@ Eight phases, ~18 weeks of work. Dependencies and gates stated. Phase 1 runs par
 - `P` — PTF1A activity, autoregulatory, requiring an E-protein partner
 - `R` — RBPJL, produced **only** as a function of P. No P-independent term. That zero *is* the bootstrap claim.
 - `C` — slow chromatin/memory state at metaplasia loci
-- Algebraic, not differential: `E_free = E_total − k·ID3`, with `ID3 = f(pERK)`
-- **pERK is an input, not a state.** Trametinib sets it; it equilibrates orders of magnitude faster than C.
+- **Algebraic, not differential: `E_free` from the exact binding solution**, with `ID3 = f(pERK)`. *(Amended — see below. `E_free = E_total − k·ID3` is the tight-binding limit of that solution, not an independent modelling choice, and it goes negative once `k·ID3 > E_total`.)*
+- **pERK is an input, not a state — and on withdrawal it is not a step.** *(Amended — see below.)*
+
+**`E_free`: use the exact solution, cite the derivation.** Linear subtraction is what two-target titration reduces to when `Kd ≪` the protein totals: in that limit each ID3 molecule takes one E molecule 1:1, so `E_free → E_total − k·ID3`. That makes it the **ultrasensitive** limit, not a soft approximation — but it is only valid inside its domain, and a `max(0, ·)` floor is a hack that hides the domain violation rather than fixing it. Use the exact form from `docs/derivations/binding_polynomial.md` (already derived, previously written for a cut stage) and state in the code comment that it reduces to the linear form in the tight regime, with
+
+```
+n_eff ≈ 1.34·√(E_tot/Kd)        the diagnostic for when the approximation holds
+```
+
+as the check. No invalid region, no floor, and the derivation earns its keep. **This also matters downstream:** Phase 3 convolves the per-cell dose distribution against this threshold, and a soft threshold and a sharp one give different converted fractions — which is the headline number.
+
+**pERK on withdrawal: a swept rebound profile, not a step.** Trametinib sets pERK while present. When it is withdrawn, pERK does not jump instantly to baseline; it recovers on its own timescale, with a possible overshoot from relief of ERK-mediated negative feedback on RAF. Because the primary endpoint of this whole plan is *what happens after withdrawal*, that recovery shape is not a detail — it sets how hard the system is pushed back toward the metaplastic basin at exactly the moment durability is being tested.
+
+Model it as a **prescribed, parameterized input curve** — rise time, overshoot amplitude, settling time — **swept across its plausible shape**, not as a state. This buys the phenomenon without a phospho-MEK state, without a coupled algebraic loop, and without spending identifiability on parameters nobody has measured.
+
+**And it is measurable.** A pERK western timecourse after trametinib washout in AR42J hands the model the actual curve, converting an unmeasured state into a measured input. That is on Bench Handshake #1.
+
+**Explicitly retired:** the trametinib-vs-PD325901 withdrawal-asymmetry prediction. It was a free-prize prediction about an experiment nobody is running. See decision 002's amendment — retired, not merely set aside, because an unretired claim is one someone builds on later.
 
 **Nondimensionalize.** Thirty parameters with no nondimensionalization is conspicuous to anyone with the relevant PhD. Collapsing to ~8 dimensionless groups takes days and directly blunts the "none of your parameters are measured" attack, because *ratios* and *timescale ratios* are often constrained even when absolute rates are not.
 
@@ -206,7 +262,9 @@ Then run a **mixture-amount design** — proportions on the simplex crossed with
 
 **Ordering, reduced to its useful core.** Not n! and not a Lie-bracket formalism. A **two-block question**: does the ERK-lowering (permissive) block precede the TF (instructive) block? Three arms — before / simultaneous / after — at most two gap lengths. Six wells.
 
-The model makes a **signed, falsifiable prediction**: if ID3 titrates E47, PTF1A mRNA delivered while ERK is high arrives in a cell where its obligate partner is sequestered — wasted payload. **Trametinib-first should strictly dominate.** If it doesn't, the titration node is wrong and that is a real finding. Report as one number in plain English — *"doing it backwards costs N-fold"* — citing Letsou & Cai (PMID 27560383) for the general formalism. No priority claim.
+The model makes a **signed, falsifiable prediction**: PTF1A mRNA delivered while ERK is high arrives in a cell where its obligate partner is sequestered by ID3 — wasted payload. **Trametinib-first should strictly dominate.** Report as one number in plain English — *"doing it backwards costs N-fold"* — citing Letsou & Cai (PMID 27560383) for the general formalism. No priority claim.
+
+**Be precise about what a null here would mean** *(amended v3.1)*. The titration node itself is documented in AR4-2J (§1.4, Dufresne 2010) — a null does **not** refute it. The assumption this arm actually tests is the **ERK→ID3 edge**: that trametinib lowers ID3 in these cells at all. **Check that first with Bench Handshake item 8** — one ID3 western, ± trametinib. If trametinib does not lower ID3 here, trametinib-first has no mechanistic basis and the ordering arms should not be run; six wells are better spent elsewhere. That is a cheap pre-flight, not a post-hoc caveat.
 
 ## PHASE 6 · Held-out prediction — 2 weeks
 
@@ -272,7 +330,9 @@ Do not re-propose these. Each has a specific reason.
 | **FIM sloppiness analysis** | A symptom of over-parameterization now removed. Replaced by profile likelihood on three parameters. |
 | **Lie-bracket ordering formalism** | Precedent exists (Letsou & Cai 2016, PMID 27560383) — the novelty claim was false. On a 3-state system the sign follows from the titration term by inspection. Survives as one number in plain English. |
 | **2^k subset enumeration** | The mass budget makes this a mixture problem; enumeration visits only simplex vertices and cannot express the ratios where titration lives. |
-| **Pareto front as deliverable** | Preference-free by construction. The two axes are also coupled through MEK — trametinib buys redifferentiation by blocking proliferation (PMID 28090569) — so much of the "front" is one dose axis re-plotted in two dimensions. |
+| **Pareto front as deliverable** | Preference-free by construction, and **a one-shot experiment consumes a decision, not a set.** The two axes are also coupled through MEK — trametinib buys redifferentiation by blocking proliferation (PMID 28090569) — so much of the "front" is one dose axis re-plotted in two dimensions. **This is an explicit reversal, not an omission:** the previous plan and decision 001 both named the reversal-vs-viability Pareto question "a headline result and the stated objective". **Replaced by constrained optimization** — maximize durable reversal subject to viability ≥ X — **plus a therapeutic index**, the ratio of viability-limiting dose to efficacious dose. |
+| **Trametinib-vs-PD325901 withdrawal asymmetry** | *Retired v3.1.* A free-prize prediction about an experiment nobody is running. It required a phospho-MEK state (`W`) to have anywhere to live, and pERK is an input here. Retired rather than set aside — see decision 002's amendment. |
+| **U-shaped viability hazard as a differential equation** | *Retired v3.1.* Its parameters were never measurable, ER-stress dynamics were the least-constrained part of the old model, and the bench measures viability directly. Modelling what you can measure, with parameters you cannot, is backwards. Survives as an **output flag**: warn when predicted `P` falls below the CHOP threshold. See decision 008's amendment. |
 | **Gillespie bimodality vs public scRNA-seq** | Replaced by delivery-induced per-cell heterogeneity, which is the bimodality that *changes the recommendation* and is falsifiable at the bench. |
 | **CellOracle as validation** | Predicted to fail on the known true positive for structural reasons. Keep as a declared negative control; presenting it as orthogonal validation hands a hostile judge a loaded question. |
 | **Enformer/Borzoi, AlphaFold→k_on, Perturb-seq, ipTM linker scans, one-sided U_crit, structural/Kalman controllability, full-dimension HJ reachability, MPC, all-atom MD** | Killed by earlier panels. Reasons in git history. |

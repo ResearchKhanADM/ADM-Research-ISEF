@@ -1,7 +1,77 @@
 # 002 · `W` (phospho-MEK) as an 11th state, protected from elimination
 
 *Date:* 2026-08-15
-*Status:* accepted
+*Status:* **SUPERSEDED 2026-08-15 by the amendment below.** The original decision
+is preserved unedited underneath, because it is the reasoning that produced the
+amendment and because deleting a decision makes its reversal unauditable.
+
+---
+
+## AMENDMENT — `W` is removed; its phenomenon becomes a swept input profile
+
+**Two separate things were tangled in the original decision, and they now go
+different ways.**
+
+**1. The state `W` is removed.** v3 Phase 2 makes pERK an **input, not a state**,
+and there is no room for a phospho-MEK pool inside a 3–4 state core with ~9–12
+parameters. Note honestly *how* this happened: **the original decision's own
+reversal condition #1 — a Stage 1 finding that the ADM attractor sits too far
+from the separatrix for any plausible impulse to matter — was never tested.**
+`W` is going because the architecture changed, not because the impulse argument
+was refuted.
+
+**2. The phenomenon is kept, as a prescribed input.** This is the part that would
+have been wrong to drop silently. v3's entire spine is **durability after
+withdrawal**, and pERK rebound is a *withdrawal-specific* mechanism — so deleting
+it would have deleted the thing most relevant to the new primary endpoint.
+
+So pERK stays an input, but **stops being a step**. On withdrawal it follows a
+**prescribed rebound profile** — a parameterized curve (rise time, overshoot
+amplitude, settling time), **swept across its plausible shape**. This captures
+the mechanism without a state, without the coupled algebraic loop `W` forced,
+and without spending identifiability on rate constants nobody has measured.
+
+**Why this is strictly better than modelling pMEK.** It converts an unmeasured
+state into a **measured input**: a pERK western timecourse after trametinib
+washout in AR42J hands the model the actual curve. That is Bench Handshake item
+7. It is the same move v3 makes everywhere else — push the unmeasured quantity
+onto the bench rather than onto the parameter vector — and a measured input beats
+a sampled state on both identifiability and defensibility.
+
+The original decision's substantive insight **survives intact and now attaches to
+the input instead of the state**: in a bistable system a transient can have a
+permanent consequence, because the overshoot does not need to persist — it needs
+only to carry the slow state back across the separatrix. That is exactly what the
+rebound profile is for, and it remains a **conditional** claim: report the
+fraction of the swept profile range in which withdrawal relapses. `RAF_drive`'s
+decreasing-in-`K_eff` sign, the reason an overshoot exists at all, is now encoded
+in the *shape* of the profile rather than in a differential equation.
+
+## RETIRED — the trametinib-vs-PD325901 withdrawal asymmetry
+
+**Retired, not set aside.** An unretired claim is one someone builds on later.
+
+It was a free-prize prediction about an experiment nobody is running. It required
+a state for the two drugs' differing points of action (`f_act` blocking MEK
+*phosphorylation*, `f_cat` blocking MEK *output*) to have anywhere to be stored,
+and with pERK as an input there is no such place. The prediction is **withdrawn
+from the project's claims**. Do not reinstate it without reinstating the state,
+and do not reinstate the state without a reason better than the prediction.
+
+*(Note for the record: this is a **different** asymmetry from the 10×
+MEKi-vs-forced-PTF1A one that v3 Part 0.3 kills as unmeasured. Part 0 does not
+address this one at all. It is being retired here on its own merits — scope, not
+evidence.)*
+
+**What would reverse the amendment.** A measured pERK washout timecourse showing
+a rebound so slow or so large that a *prescribed* profile cannot represent it —
+i.e. the recovery shape depends on the state of the system rather than only on
+time. Then it is genuinely a state again, and `W` comes back with a measurement
+behind it instead of an argument.
+
+---
+
+*Original decision, 2026-08-15, preserved below.*
 
 ## Question
 

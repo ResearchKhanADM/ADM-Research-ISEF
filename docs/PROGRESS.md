@@ -359,3 +359,87 @@ strongest result, and it is the one no literature value can substitute for.
    experimental wells actually exist*. Everything in Phases 4, 5 and 7 is a
    function of that number, and the previous plan's mistake was optimizing before
    knowing it.
+
+---
+
+## 2026-08-15 · Session 4 — six calls absorbed; golden pinned; parameter budget
+
+All four open questions from session 3 answered by Luqmaan, plus two he raised.
+Documents and fixtures done; **the RHS is deliberately not written yet** — the
+parameter budget is a gate.
+
+### Done
+
+- **Golden trajectory pinned before anything is deleted** —
+  `scripts/pin_golden_trajectory.py` → `tests/golden/`. Two initial conditions
+  (acinar, ADM) integrated on the 11-state system for 1500 h, with a manifest,
+  hashes and a `stamp_run()`. **The old implementation has two attractors**, and
+  the ADM one sits at `R ≈ 0` — the bootstrap claim showing up in the fixture
+  rather than in a paragraph. That is the qualitative property the rewrite gets
+  compared against; it will not match numerically and is not meant to.
+  **The parameter set is arbitrary and unmeasured** — labelled as such in the
+  script, the manifest and `CLAUDE.md`. No number from it may ever be reported.
+- **v3 amended in place to v3.1** with calls 1–4, plus an amendment banner at the
+  top so the edits are visible rather than silent. Bench Handshake #1 is now a
+  **table of 8 blocking items** with what each one blocks.
+- **Decision files amended, originals preserved underneath** — deleting a decision
+  makes its reversal unauditable:
+  - **002** — `W` removed; the phenomenon becomes a **swept pERK rebound profile**;
+    trametinib-vs-PD325901 **retired outright**.
+  - **006** — **promoted.** It is no longer a topology discriminator; it is the
+    justification for v3's `E_free`, and its `n_eff` is Phase 3's threshold sharpness.
+  - **008** — **retired.** Viability is a bench-measured floor; the CHOP arm
+    survives as an output flag, not a term.
+  - **012** — the six calls recorded as resolutions, including the Pareto cut as an
+    **explicit reversal** rather than an omission.
+- **`CLAUDE.md` updated and still under 200 lines** (199): exact `E_free` with no
+  floor hack, the pERK rebound profile, viability retired, the flagship guard test,
+  the arm-budget tiering, and hard rule 7 — *a retired claim is retired, not paused*.
+- **`docs/PHASE2_PARAMETER_BUDGET.md` written** — the gate. See below.
+
+### The number, before the RHS is written
+
+**11 states → 3. 61 parameters → 11 dimensionless groups**, of which 3 are Hill
+exponents that are scanned rather than fitted, so the effective fitting dimension
+is **8**. Inside v3's 9–12 target.
+
+Profile likelihood goes on the three that carry the results: **`a_P`** (does the
+loop close), **`γ = δ_C/δ_P`** (how long it holds — the durability knob), **`κ =
+K_d/E_tot`** (threshold sharpness, which feeds Phase 3).
+
+`κ` surfacing as a group is a **consistency check that passed**:
+`prereg/id3_kd_prior_justification.md` predicted the nondimensionalization would
+produce `K_d/E_tot` as a single group, and said that if it did not, the
+nondimensionalization was wrong. It did.
+
+Four judgement calls are flagged in that file rather than buried — one `K_d`
+instead of two, `n_C` possibly removable (→ 10 groups), `A` not a state, and
+`ε_C`/`θ_C` as the least-constrained pair.
+
+### Broke
+
+- Nothing. One sequencing note: **`topology.py` and `model.py` are still present.**
+  `model.py` imports `topology.py`, so deleting either alone breaks the other, the
+  test suite, and the golden-trajectory script that was just built. They come out
+  **in the same commit as the new core**, not before it. 20 tests still pass.
+
+### Next
+
+1. Luqmaan signs off on the 11 groups (or cuts `n_C` to 10).
+2. Write `src/core.py` — the 3-state RHS — with the flagship guard test **first**:
+   *`dR/dt` has no P-independent term*, as a guard-on-the-guard, plus the dynamic
+   companion (`R` must not rise from zero while `P` is held at zero).
+3. Same commit: delete `topology.py`, `model.py`, `payload_subsets()` and the tests
+   that die with them; move `binding.py` and its derivation to supplementary.
+4. Nondimensionalize in code, not just on paper. Then Gate B: two stable states plus
+   a saddle, identifiable separatrix.
+
+### Open questions
+
+1. **Sign-off on the parameter budget** — 11 groups, or 10 with `n_C = 1`?
+2. **One `K_d` or two?** Proposal is one, with the Langlands 1997 asymmetry as a
+   declared sensitivity check rather than a second parameter. It is a real
+   asymmetry but it rests on a rank order measured in yeast against different
+   partners, and it costs a parameter out of a budget of eleven.
+3. **Arm budget** — still an external unknown. Placeholder 12/24/48 is now written
+   into v3 Phase 0, and Phase 4's design must be instantiable at each tier.

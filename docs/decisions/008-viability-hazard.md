@@ -1,6 +1,54 @@
 # 008 · `dS/dt`, `γ(capacity)`, and the U-shaped hazard
 
-*Date:* 2026-08-15 · *Status:* accepted
+*Date:* 2026-08-15 · *Status:* **RETIRED 2026-08-15 by the amendment below.**
+Original preserved underneath.
+
+---
+
+## AMENDMENT — viability is a bench-measured floor, not a modelled hazard
+
+v3 states the viability **constraint** (Phase 0 sets a floor X; Phase 7's decision
+rule maximizes durable reversal subject to it; the deliverable is a therapeutic
+index) but never explicitly retired the hazard, which left decision 008 in limbo
+— neither kept nor cut. **Cut.**
+
+**Reasoning, and it is short because the argument is one-sided.**
+
+1. **None of its parameters were ever measurable.** `h_max_cargo`, `s_crit`,
+   `nu_s`, `h_max_chop`, `p_crit`, `mu_p` — six parameters, no measurements, all
+   of them entering a quantity the bench reads directly off a plate.
+2. **ER-stress dynamics were the least-constrained part of the old model.** `S`
+   (secretory cargo/capacity) does not survive into the 3–4 state core at all, so
+   the hazard's high-cargo arm has nothing left to attach to.
+3. **The bench measures viability directly.** *Modelling something you can
+   measure, using parameters you cannot, is backwards.* That is the whole case.
+
+**Kept — one thing, as a flag rather than a term.** The low-PTF1A arm of the U is
+real biology: CHOP-dependent apoptosis under PTF1A loss (Sakikubo 2018, PMID
+30361559), and blocking dedifferentiation under stress *increases* death (Backx
+2021, PMID 33762742). So **if the model predicts `P` below the CHOP-apoptosis
+threshold, surface that as a warning on the output.** It does not need to be a
+differential equation to do its job, which is to stop a recommendation that
+quietly relies on driving PTF1A through the floor.
+
+**What this costs, stated plainly.** The reversal–viability plane is no longer
+something the model produces; it is something the experiment produces. The model
+predicts durable reversal, the bench supplies viability, and Phase 7 combines
+them under a pre-specified rule. That is a smaller claim and a more defensible
+one.
+
+**What would reverse it.** A viability result the bench cannot explain — cells
+dying in an arm where reversal succeeded and PTF1A never approached the CHOP
+threshold. That would mean a death mechanism the flag does not cover, and it
+would need structure rather than a threshold. Note that the original decision's
+own reversal condition 2 (the HO-2 dissociation: MEK inhibition reverting with
+cCasp3 rare, KRAS extinction reverting with extensive cell death) still stands as
+a **held-out prediction target in Phase 6** — it just no longer needs a hazard
+equation to be stated as one.
+
+---
+
+*Original decision, 2026-08-15, preserved below.*
 
 ## Question
 

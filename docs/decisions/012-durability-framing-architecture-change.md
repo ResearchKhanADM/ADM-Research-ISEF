@@ -102,7 +102,7 @@ Consequences, stated explicitly so nothing is reversed by silence:
 | Stage 6 Lie-bracket precondition in 011 | **dead**; pulse forcing itself survives | precedent exists (PMID 27560383) |
 | Screen as second arm, decision 001 | **demoted** to prioritization + a declared CellOracle negative control | identity is published |
 | Pareto front as deliverable | **dead** → maximize durable reversal s.t. viability ≥ X, report therapeutic index | preference-free by construction |
-| U-shaped hazard, decision 008 | **open** — see "what this leaves unresolved" | no `S` state survives at 3–4 states |
+| U-shaped hazard, decision 008 | **retired** — viability becomes a bench-measured floor + a CHOP output flag | see resolution 3 below |
 
 **Two of these deserve their own sentence, because they are being reversed by
 architecture change rather than by their own stated reversal conditions.**
@@ -128,6 +128,72 @@ the headline number. **Keep the derivation as supplementary and re-read it when
 Phase 3 sets the threshold's sharpness.** v3 specifies only `E_free = E_total −
 k·ID3`, a linear form; whether that is sufficient for Phase 3 is an open question,
 not a settled one.
+
+## Resolutions — the six open items, decided 2026-08-15
+
+The audit above left six things unresolved. All six are now decided by Luqmaan.
+v3 is amended in place (v3.1); the affected decision files carry their own
+amendments.
+
+**1 · `W` — pERK stays an input, but gains a withdrawal rebound profile.**
+Neither "add `W` back" nor "drop it". v3's spine is durability *after
+withdrawal*, and pERK rebound is a withdrawal-specific mechanism — deleting it
+silently would have deleted the thing most relevant to the new endpoint. So pERK
+stays an input and stops being a *step*: on withdrawal it follows a prescribed,
+**swept rebound profile**. No state, no coupled algebraic loop, no identifiability
+cost. The gain is that it converts an unmeasured state into a **measured input** —
+a pERK western timecourse after washout, now Bench Handshake item 7. **The
+trametinib-vs-PD325901 comparison is retired outright**, not set aside: it was a
+free-prize prediction about an experiment nobody is running, and an unretired
+claim is one someone builds on later. Decision 002 amended.
+
+**2 · v3 Part 1.4 rewritten, narrower and stronger.** See the correction section
+below, which is what prompted it. The limitation as written would have had this
+project disclaiming published work on a poster. The residual gap is **one edge —
+ERK→ID3 — not the whole node**, and it is testable with a single western
+(Bench Handshake item 8). Phase 5's ordering prediction is therefore *better*
+supported than v3 claimed. Say it that way.
+
+**3 · Viability becomes a bench-measured floor; the hazard is retired.** Its six
+parameters were never measurable, ER-stress dynamics were the least-constrained
+part of the old model, and the bench measures viability directly. Modelling what
+you can measure with parameters you cannot is backwards. **Kept as a flag, not a
+term:** warn when predicted `P` falls below the CHOP-apoptosis threshold — the
+low-PTF1A arm is real biology (Sakikubo 2018) that does not need a differential
+equation. Decision 008 retired.
+
+**4 · `E_free` uses the exact binding solution.** The observation that
+`E_total − k·ID3` is the *tight-binding limit* of decision 006's equilibrium is a
+save, not a problem: it makes the derivation v3's justification rather than dead
+work. **Do not ship the linear form with a floor hack** — the negativity at
+`k·ID3 > E_total` is the approximation announcing it has left its domain, and
+clipping hides that rather than fixing it. Ship the exact form; comment that it
+reduces to the linear one in the tight regime, with `n_eff ≈ 1.34·√(E_tot/Kd)` as
+the validity diagnostic. Decision 006 promoted.
+
+**5 · The guard test is the flagship.** *"`dR/dt` has no P-independent term"* is
+the bootstrap claim expressed as a zero, and violating it would run clean while
+predicting the opposite — the same failure class the retired `raf_drive` test
+guarded. It gets the same treatment: a **guard-on-the-guard** that constructs the
+violating implementation and *requires* it to fail, because an assertion passing
+for both the correct and incorrect version tests nothing. Plus a **dynamic**
+companion: `R` must not rise from zero while `P` is held at zero, which catches an
+accidental basal term that a structural check would miss.
+
+**6 · The Pareto cut is an explicit reversal, recorded as one.** The previous plan
+and decision 001 both called the reversal-vs-viability Pareto question "a headline
+result and the stated objective". It is cut deliberately: **a front is
+preference-free by construction, and a one-shot experiment consumes a decision,
+not a set.** Replaced by constrained optimization — maximize durable reversal
+subject to viability ≥ X — plus a therapeutic index. Recording it as a decision
+rather than letting it read as an omission.
+
+**On the arm budget.** Not a modelling choice — a **blocking external input** that
+depends on the wet lab and is not known yet. It does not block Phases 2–3. Phase 0
+carries an explicit placeholder range (12 / 24 / 48 wells), Phase 4's
+mixture-amount design must be instantiable at any tier, and the deliverable
+includes **what changes at each tier**, so the number can be argued for rather
+than accepted.
 
 ## A correction to v3 itself
 

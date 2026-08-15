@@ -1,0 +1,29 @@
+{
+  "written": "2026-08-15T07:46:58+00:00",
+  "git": {
+    "commit": "e5d24e181e97c3bc8229e751a67770a12f967f5f",
+    "branch": "main",
+    "dirty": false
+  },
+  "env": {
+    "python": "3.13.9",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "packages": {
+      "numpy": "2.5.2",
+      "scipy": "1.18.0",
+      "matplotlib": "3.11.1",
+      "pandas": "3.0.5",
+      "sympy": "1.14.0"
+    }
+  },
+  "seed": null,
+  "params": {
+    "note": "arbitrary fixture set"
+  },
+  "note": "golden trajectory pinned before the Phase 2 rewrite",
+  "outputs": {
+    "tests\\golden\\golden_acinar.csv": "c38f8c4060fcdc034e967400de6d978d2d7ddd9677fe063d6f2ebb9f82a20859",
+    "tests\\golden\\golden_adm.csv": "dcebfe4d244a5b861a1b58aaf29eb97da28a60ca1d5c5c03fe6c6be75d0bc9de",
+    "tests\\golden\\manifest.json": "86d67d2057e7933e45c4c2cff10d3011c780988ed7687799c86c24b2746ab110"
+  }
+}

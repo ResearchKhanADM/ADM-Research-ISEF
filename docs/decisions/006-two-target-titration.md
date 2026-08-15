@@ -1,6 +1,60 @@
 # 006 · Two-target competitive titration, solved at equilibrium
 
-*Date:* 2026-08-15 · *Status:* accepted
+*Date:* 2026-08-15 · *Status:* **accepted, and PROMOTED 2026-08-15** — see the
+amendment below. This is now load-bearing for the v3 core and for Phase 3.
+
+---
+
+## AMENDMENT — this is no longer a topology discriminator; it is the model
+
+**What changed.** The T1-vs-T2 topology competition this decision was written to
+serve is cut (decision 012). For about a day that made this file look like dead
+work. It is the opposite.
+
+**v3's `E_free = E_total − k·ID3` is the tight-binding limit of the equilibrium
+solved here.** When `Kd ≪` the protein totals, each ID3 molecule takes one E
+molecule 1:1 and the exact solution reduces to exactly that linear subtraction.
+So the linear form is not an independent modelling choice competing with this
+one — it is **this decision's mechanism, in its ultrasensitive limit**, and this
+file is its justification.
+
+**Consequence 1 — ship the exact form, not the linear one with a floor.** The
+linear expression goes negative once `k·ID3 > E_total`. That negativity is not a
+numerical nuisance to be clipped; it is the approximation announcing it has left
+its domain. A `max(0, ·)` hack hides the domain violation instead of fixing it.
+Use the exact solution from `docs/derivations/binding_polynomial.md`, and state
+in the code comment that it reduces to `E_total − k·ID3` in the tight regime,
+with
+
+```
+n_eff ≈ 1.34·√(E_tot/Kd)          derivation §6 — the validity diagnostic
+n_eff → 2                          derivation §5 — the loose limit
+```
+
+as the check on which regime a given sample is actually in. No invalid region, no
+hack.
+
+**Consequence 2 — the ultrasensitivity result now feeds Phase 3, the headline.**
+Phase 3 convolves the per-cell LNP dose distribution against the P–R bootstrap
+threshold to get converted fraction. **How sharp that threshold is determines the
+answer**, and `n_eff` is exactly that sharpness. A soft threshold and an
+ultrasensitive one give different converted-fraction curves and therefore a
+different co-formulation gap — which is the number the whole project reports. The
+table in the original decision below is no longer a statement about model
+selection; it is a statement about the shape of the headline result.
+
+**Consequence 3 — the Kd prior is still decisive, for a new reason.** It no
+longer decides whether a topology competition can discriminate. It decides how
+sharp the threshold is, and therefore the size of R1. `prereg/id3_kd_prior_justification.md`
+survives for that reason; its Stage 2 framing does not.
+
+**What does NOT survive:** T1-vs-T2 as competing topologies, the Q-value
+comparison, and `first_order_sequestration` as a rival mechanism to be beaten.
+The first-order sink is now simply a wrong limit, not a candidate.
+
+---
+
+*Original decision, 2026-08-15, preserved below.*
 
 ## Question
 
