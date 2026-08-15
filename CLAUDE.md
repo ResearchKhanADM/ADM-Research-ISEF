@@ -18,12 +18,13 @@ on. "Reverse ADM" is eleven years late. The unoccupied claim is durability:
 promoter, so the loop cannot re-close on its own — that bootstrap failure is why
 reversion is drug-dependent, and it is what the payload is for. Payload
 **identity is not the claim**; it is published (Jiang 2023, PMID 37425649). The
-claim is **composition, ratio, formulation and schedule under a fixed delivery
-budget** — three results everything serves: **R1 formulation ★** (co-formulated vs
-separate particles across the uptake-CV range; for an obligate stoichiometric pair
-a requirement, not a preference) · **R2 composition** (count and ratio under fixed
-total mRNA mass — a marginal-value curve, not a subset table) · **R3 durability**
-(the drug-free persistence window — **what the bifurcation diagram is for**).
+claim is **formulation and durability under a fixed delivery budget** — **two**
+results (R2 merged into R1, v3.3): **R1 ★ reversal is threshold-limited, not
+ratio-limited** — what matters is both components above threshold *in the same
+cell*, which is why co-formulation gives `p` not `p²`; above threshold composition
+is **free**, and the model is explicit it cannot pick a ratio · **R3 durability**
+is a **threshold property of post-withdrawal drive**, not graded in dose or
+schedule (**what the bifurcation diagram is for**).
 
 ## Layout
 
@@ -51,8 +52,10 @@ the ordering arms**) → redosing interval + order · **6** held-out prediction,
 
 **Gates — stop and report. A failed gate is a real result, not a reason to push on.**
 **A** does the pipeline recover PTF1A / RBPJL / BHLHA15? — if no, it is broken in
-month one. **B** two stable states plus a saddle, identifiable separatrix, key
-parameters surviving profile likelihood. **C** does the KRAS-history effect fall out
+month one. **B** *(reworded — the old "surviving profile likelihood" defined a gate
+by a method that cannot run without data)*: two stable states plus a saddle,
+separatrix located by continuation, fold loci bounding the window reported with the
+prior-predictive spread. **MET.** **C** does the KRAS-history effect fall out
 of a **single** parameter? **Never cut:** 0, 2, 3, 7. **Cut order under
 compression:** 6 → Phase 4's simplex interior → Phase 5's ordering arms.
 
@@ -75,11 +78,27 @@ compression:** 6 → Phase 4's simplex interior → Phase 5's ordering arms.
   Withdrawal *is* the endpoint, so the recovery shape is mechanism (002 amendment).
 - **Viability is measured at the bench, not modelled** (008 retired). One survivor,
   a flag not a term: warn when predicted `P` drops below the CHOP threshold.
-- Profile likelihood on `a_P`→R2, `γ`→R3, `κ`→R1 — **it is the uncertainty on each
-  deliverable**, not an identifiability side-quest. **Not** an FIM eigenspectrum.
+- **NO profile likelihood — there is no data, so there is no likelihood** (013).
+  And the `a_P`→R2 / `γ`→R3 / `κ`→R1 mapping is **WITHDRAWN**: `a_R` and `n_P` move
+  R1 more than `κ` does. Report instead the **fold locus** (exact, from
+  continuation) and **prior-predictive intervals on the deliverables**; a flat
+  profile is reported as *structural non-identifiability*, under that name.
 - **Flagship guard test:** *`dR/dt` has no P-independent term* — as a
   guard-on-the-guard (construct the violating version, require it to fail), plus a
   dynamic companion: `R` must not rise from zero while `P` is held at zero.
+
+## ⚠ NUMERICAL INFRASTRUCTURE GETS AN INDEPENDENT CHECK, NOT PLAUSIBLE OUTPUT
+
+**Any Jacobian, continuation step, eigenvalue path or manifold computation must be
+checked by a second method derived a different way** — an analytic reduction, a
+closed form, a known-answer test problem. Plausible output is not evidence.
+
+The clamp bug is the case to remember: a finite-difference step crossed
+`max(y,0)` and returned **exactly half** the true Jacobian entry. It produced
+**correct signs, correct stability labels, a clean run with zero failures, and a
+rendered figure.** Every downstream consumer would have accepted it. The only
+thing that caught it was an analytic reduction computed a different way — which
+also proved the continuation had missed no branch, and yielded three theorems.
 
 ## ⚠ THE INTEGRITY FORK — standing answer, never a case-by-case call
 

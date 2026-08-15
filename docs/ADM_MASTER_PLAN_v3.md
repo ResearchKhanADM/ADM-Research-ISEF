@@ -123,9 +123,17 @@ PTF1A works as a trimer: PTF1A + an E-protein (E47/HEB) + RBPJL. PTF1-L drives *
 
 **R1 — Formulation.** Co-formulation versus separate particles, quantified across the plausible uptake-CV range. For an obligate stoichiometric pair, this is a requirement, not a preference.
 
-**R2 — Composition.** How many components, at what ratio, under a fixed total mRNA mass. Stated as a number with a marginal-value curve: *"two components; the third buys under X% of durable reversal for 33% of the mass budget."*
+**R2 — MERGED INTO R1 (v3.3).** Composition was to be *"how many components, at what ratio."* **The model cannot produce a ratio, and is explicit that it cannot:** every PTF1A:RBPJL mass split from 2% to 98%, at total masses 2, 10 and 40, lands within **1% of maximum**, with the final attractor identical to four decimal places. The model decides *whether the threshold is crossed*; after that the attractor is the same.
 
-**R3 — Durability.** *(restated v3.2 — see decision 015, which measured what actually sets relapse.)* **Durability is a threshold property of the post-withdrawal KRAS drive, not a graded property of dose or schedule. The payload buys the crossing; whether it sticks is decided by whether the drive sits inside the persistence window — and nothing the payload or the schedule does moves that window.** **This is what the bifurcation diagram is for.** In the old plan the hysteresis wedge was a decorative figure with no job; here it is the answer.
+Under the integrity fork the answer is to restate the deliverable, not to add a mechanism that manufactures a ratio. So R1 and R2 become **one claim**, and it is a stronger one:
+
+> **R1 — Reversal is threshold-limited, not ratio-limited.** What matters is getting both components above threshold **in the same cell**, which is why co-formulation gives `p` rather than `p²`. Above threshold, **composition is free**: the ratio does not move the attractor.
+
+Three reasons this is a better deliverable than a ratio. It is a **tolerance statement**, and wide formulation tolerance is good news for a one-shot experiment where you cannot iterate on the mix. It **unifies two headline results into one sentence** rather than two competing ones. And it **declines to quote a number the model cannot support**, which is the rule.
+
+*What would reverse it:* a bench result showing durable reversal depends on the mix ratio at fixed total mass. *Checked and refuted:* a panel claim that the co-formulation advantage inverts above a dose threshold — it cannot, since for the double-above-threshold criterion correlation gives `p` and independence gives `p²`, and `p ≥ p²` always.
+
+**R3 — Durability** *(now the second of two results; numbering kept so cross-references survive)*. *(restated v3.2 — see decision 015, which measured what actually sets relapse.)* **Durability is a threshold property of the post-withdrawal KRAS drive, not a graded property of dose or schedule. The payload buys the crossing; whether it sticks is decided by whether the drive sits inside the persistence window — and nothing the payload or the schedule does moves that window.** **This is what the bifurcation diagram is for.** In the old plan the hysteresis wedge was a decorative figure with no job; here it is the answer.
 
 Three things this rules out, all measured rather than assumed: relapse is **not** chromatin-limited (`d ln t_relapse / d ln γ ≈ 0`, and freezing `C` changes relapse timing by <4%); **drug-hold duration does not set durability** (relapse timing is identical across a 40-fold range of chromatin written before withdrawal); and **payload composition does not set it either**. What the claim gains from this is falsifiability — it predicts durability is **all-or-nothing in KRAS level and flat in payload dose**, which one experiment can refute.
 
