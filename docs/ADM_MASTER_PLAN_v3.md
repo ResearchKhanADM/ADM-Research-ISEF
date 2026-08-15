@@ -94,6 +94,7 @@ Also note: submodular optimization is *inappropriate* here. The (1−1/e) greedy
 | "stability selection" | Resampling a parameter ensemble | Stability selection resamples **data**. Do it across ≥2 **independent datasets** and report per-dataset frequency, or call it a sensitivity analysis. |
 | "selection / confirmation split" | Train/test across halves of the same generative model | Controls parameter overfitting, says nothing about **model misspecification**, which is the dominant error source here. Rename to dataset-level cross-validation and say what it does not cover. |
 | "held-out prediction" | Constrained on 2 observations with ~30 parameters | With 30 parameters, 2 constraints remove almost nothing. Report the prediction as an **interval over all parameter vectors passing the filter**. If the interval spans everything, there is no prediction. |
+| **"profile likelihood"** *(added v3.2)* | Profiling a parameter ensemble against tolerances **chosen by the modeller**, with no data anywhere | **Profile likelihood needs a likelihood, i.e. data.** Measured: the resulting "interval" is 100% of the prior box for `a_P` and `γ`, and halving the invented tolerance moved `κ`'s from 100% to 67% — the width is a number the modeller typed. Same shape as row 1: a data-based method's name on a data-free operation. **Report instead** the fold locus from continuation (exact, not calibrated), and constraint-filtered prior-predictive intervals **on the deliverables** — which is row 3's own prescription, applied to Phase 2. **Reserve the name for the wet-lab timecourse**, and pre-register it now. A flat profile is still worth reporting, correctly named: it is the textbook signature of **structural non-identifiability**. |
 
 ---
 
@@ -181,8 +182,9 @@ A design that degrades gracefully across tiers is worth more than one that is op
 | 6 | ADM stability to ≥14–21 days | Phase 5 durability endpoint | no contrast if the state does not hold unassisted |
 | 7 | **pERK western timecourse after trametinib washout** | **Phase 2 input, Phase 5 ★** | *added v3.1.* Supplies the rebound profile directly instead of sampling its shape — converts an unmeasured state into a measured input |
 | 8 | **ID3 by western, ± trametinib** | **Phase 5 — decides whether it means anything** | *added v3.1.* **High value, one western.** Tests the ERK→ID3 edge, the single assumption Phase 5's ordering prediction rests on. If trametinib does not lower ID3 here, trametinib-first loses its mechanistic basis |
+| 9 | **PTF1A protein half-life** (cycloheximide chase) | **Phase 2's clock AND Phase 5's redosing axis** | *added v3.2.* **The model has no clock without it.** Time is nondimensionalised by `δ_P`, which is absorbed into the scaling and unmeasured — so every predicted duration is in arbitrary units. Two consequences: published day-valued timings collapse to *k−1* usable constraints (Collins' two give one ratio), and **Phase 5's redosing interval cannot be quoted in hours**. Item 4 does *not* cover this: mRNA half-life constrains a product of dimensionless groups, not the protein clock |
 
-Items **3** and **8** are the ones to chase hardest: 3 is the only input to the strongest result and no literature value substitutes for it; 8 is cheap and decides the fate of a whole phase.
+Items **3** and **8** are the ones to chase hardest: 3 is the only input to the strongest result and no literature value substitutes for it; 8 is cheap and decides the fate of a whole phase. **Item 9 was missed until the Phase 2 core was built** — it is the difference between a redosing interval and a redosing number.
 
 ## PHASE 1 · Candidate generation — 2 weeks · parallel with Phase 2
 

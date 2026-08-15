@@ -566,3 +566,103 @@ re-measure rather than re-cite.**
 4. **Bench item 8** (ID3 western ± trametinib) — Luqmaan chasing this week. It
    tests the ERK→ID3 edge, the one assumption Phase 5's ordering prediction rests
    on.
+
+---
+
+## 2026-08-15 · Session 6 — decision protocol; Gate B met; four defects found by panel
+
+First session under the tier protocol. Four panellists ran; three reported. What
+they found is more important than what they were asked.
+
+### Tier 1 decisions (decided alone, logged)
+
+- **CLAUDE.md held at ~200 lines, not under it.** The tier protocol is ~30 lines
+  of new load-bearing content added after the 200 cap was set; the alternative was
+  deleting operating rules. Full protocol in `docs/DECISION_PROTOCOL.md`, operative
+  summary in CLAUDE.md. Duplicated reference content (cut-list reasons, limitation
+  wording, figure palette detail) now points at v3 and `figures/README.md`.
+- **Panel agents run as inlined mandates this session.** `.claude/agents/*.md` were
+  written but the registry does not pick up new definitions mid-session; the files
+  are correct for future sessions.
+- **`refine_fold` added** — fold locations are the persistence-window edges, and
+  grid resolution put the fold state out by ~3%.
+- **Separatrix bounded to the physical orthant** — below zero `core.rhs` clamps, so
+  the integrator was tracing clamped dynamics, not the model.
+- **`continue_branch` now Newton-corrects its seed** and raises if it cannot.
+- **fig02 renders at `paper` profile** into `figures/out/` from a clean tree.
+
+### Gate B — STRUCTURE MET
+
+  two folds     ERK = 0.0588 and 0.7123 (refined)
+  classes       252 stable, 82 saddle
+  saddle        2-D stable manifold in 3-D — so "separatrix" is the right noun
+  separatrix    48/48 rays, all terminating at the domain edge
+  convergence   333 corrector calls, 0 failures
+
+Continuation validated against the cusp normal form, whose folds are known
+exactly, plus a guard-on-the-guard that builds the naive sweep and requires it to
+miss the middle branch. `fig02_persistence_window` built from `results/` only.
+
+**The other half of Gate B — "key parameters surviving profile likelihood" —
+cannot be run at all. See decision 013 and T3 question 1.**
+
+### Tier 2 — DECIDED-PENDING-REVIEW
+
+- **[013 · profile likelihood is not available](decisions/013-profile-likelihood-is-not-available.md)**
+  No data, so no likelihood. Measured: the "interval" is 100% of the prior box for
+  `a_P` and `γ`, and halving the invented tolerance moved `κ`'s from 100% to 67% —
+  the width is a number the modeller typed. Same shape as v3 §0.7 row 1. Replaced
+  by the fold locus (exact), constraint-filtered prior-predictive intervals **on
+  the deliverables**, and the flat profile reported correctly as *structural
+  non-identifiability*. Name reserved for the wet-lab timecourse and pre-registered
+  now.
+- **[014 · `C` is a strict cascade](decisions/014-chromatin-is-a-strict-cascade.md)**
+  `dC/dτ` depends on the input and on `C` — **not on `P`, `R`, or the payload**.
+  Verified: identical across nine `(P,R)` combinations and identical at payload 10.
+  So the payload has no channel to the durability endpoint and **Phase 5's dose ×
+  interval map is flat by construction**. Two fixes; the choice is T3 question 2.
+
+### Broke — four defects, three of them mine
+
+1. **The one-to-one mapping `a_P`→R2, `γ`→R3, `κ`→R1 is false for R1.** `a_R`
+   (not profiled) and `n_P` (a scanned exponent) both move the co-formulation gap
+   more than `κ` does over `κ`'s own range. **`core.py`'s own `n_eff` docstring
+   already said the convolved quantity is `P·E_free·R` — the claim was refuted by a
+   file in the same repository.** Withdrawn; Sobol analysis pre-registered.
+2. **`b_P` shipped 2% above a saddle-node.** Measured critical value **0.4903**;
+   the default was 0.5 and the docs said the boundary was "roughly 0.4" — at 0.40
+   trametinib alone leaves `R = 0.18`, i.e. not reverted. `b_P` is *fitted*, so a
+   2% nudge would have crossed into a regime the literature forbids with every
+   figure still rendering. Default raised to 0.6; `B_P_CRITICAL` exported; two
+   regression tests.
+3. **`ε = 0.5` makes `C` a filter, not a memory** — bistability needs
+   `ε > 3√3/8 = 1.5396`, and `Params.eps` was commented "memory, not filter".
+   Corrected; threshold exported as `EPS_MEMORY_THRESHOLD`.
+4. **`ID3` is literally the `erk` input**, while the module docstring promised
+   "a saturating function of erk". No such function existed. Corrected — and the
+   linearity *is* the ERK→ID3 edge, so bench item 8 now has an explicit slot: it
+   measures this input map.
+
+### Changed a previously reported number
+
+- **`b_P` critical: "roughly 0.4" → 0.4903 measured.** Default 0.5 → 0.6.
+- **The `a_P`/`γ`/`κ` → R2/R3/R1 mapping is withdrawn**, in
+  `PHASE2_PARAMETER_BUDGET.md` §1 and everywhere it was to be quoted. It was never
+  reported outside the repo.
+- **Bench Handshake gains item 9: PTF1A protein half-life.** Time is `τ = t·δ_P`
+  and `δ_P` is absorbed by the nondimensionalisation and unmeasured, so **the model
+  has no clock**: Collins' two day-valued timings collapse to one dimensionless
+  constraint, and **Phase 5's redosing interval has no units**. Item 4 (mRNA
+  half-life) does not cover it.
+
+### Next
+
+1. Luqmaan answers the T3 batch (below) — questions 1 and 2 gate Phases 2 and 5.
+2. Fill in `prereg/2026-08-15_phase2_sensitivity_prediction.md`, push, **then** run
+   the Sobol analysis. Blocked until then by hard rule 1.
+3. Re-check whether relapse is chromatin-limited at all before implementing either
+   fix in 014 — a panel measured `d ln(relapse)/d ln γ ≈ 0` at high ERK, which
+   would make the question moot.
+4. `fig01_loop_schematic`; `figS0x` for the fold locus.
+
+### Open questions — batched for Luqmaan, see the session report

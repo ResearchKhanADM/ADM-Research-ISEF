@@ -1,0 +1,78 @@
+# Pre-registration · Phase 2 global sensitivity analysis
+#
+# TEMPLATE + PROPOSED RANGES. Claude writes the structure and proposes the box;
+# LUQMAAN CONFIRMS OR EDITS IT, and Luqmaan writes the prediction file. The sweep
+# does not run until both are committed AND PUSHED — the pushed timestamp is the
+# proof, and it is the only thing that makes the result mean anything later.
+#
+# WHY THIS SWEEP EXISTS
+# `docs/PHASE2_PARAMETER_BUDGET.md` §1 asserted that a_P -> R2, gamma -> R3 and
+# kappa -> R1 one-to-one. A one-at-a-time diagnostic contradicted the R1 leg:
+# a_R (not profiled) and n_P (a scanned exponent) both moved the co-formulation
+# gap more than kappa did over kappa's own range. The claim is withdrawn, and
+# this analysis replaces assertion with measurement.
+#
+# METHOD: Sobol variance decomposition (Saltelli sampling, SALib), first-order
+# and total-order indices, for EACH deliverable against ALL 12 groups. Total-order
+# is the one that matters here — it captures interaction effects, and the whole
+# question is whether a parameter's influence is direct or routed through others.
+
+name: phase2_sensitivity
+date: 2026-08-15
+status: TEMPLATE — NOT YET CONFIRMED, NOT YET RUN
+
+method:
+  estimator: sobol            # first-order S1 and total-order ST
+  sampler: saltelli
+  n_base: 1024                # total evaluations = n_base * (2*D + 2)
+  seed: 20260815
+
+# --------------------------------------------------------------------------
+# PROPOSED prior box. Log-uniform unless stated. LUQMAAN: confirm or edit.
+# Rationale for each is stated so the choice is auditable rather than defaulted.
+# --------------------------------------------------------------------------
+parameters:
+  a_P:     {low: 1.0,   high: 40.0,  scale: log,     why: "autoregulatory gain; must span below and above the fold or bistability is assumed rather than tested"}
+  b_P:     {low: 0.05,  high: 2.0,   scale: log,     why: "basal ignition; below ~0.4 at the placeholder set the model contradicts Collins, so the box must contain that boundary"}
+  c_rep:   {low: 0.1,   high: 10.0,  scale: log,     why: "memory repression strength; no measurement, order of magnitude either side of 1"}
+  n_P:     {low: 1.0,   high: 4.0,   scale: linear,  why: "Hill exponent, scanned not fitted (decision 004)"}
+  a_R:     {low: 1.0,   high: 20.0,  scale: log,     why: "Rbpjl gain; the diagnostic flagged this as a large R1 contributor, so its range must be honest"}
+  n_R:     {low: 1.0,   high: 4.0,   scale: linear,  why: "as n_P"}
+  rho:     {low: 0.1,   high: 10.0,  scale: log,     why: "RBPJL vs PTF1A turnover ratio; unmeasured"}
+  gamma:   {low: 0.002, high: 0.5,   scale: log,     why: "chromatin vs protein timescale; must reach genuinely slow or C is not a memory"}
+  alpha_C: {low: 0.1,   high: 10.0,  scale: log,     why: "chromatin write gain"}
+  k_w:     {low: 0.1,   high: 10.0,  scale: log,     why: "ERK half-max for writing, in ID3 units"}
+  eps:     {low: 0.01,  high: 3.0,   scale: log,     why: "self-reinforcement; must include ~0 (filter, not memory) to test whether memory is needed"}
+  kappa:   {low: 1.0e-4, high: 100.0, scale: log,    why: "K_d/E_tot; MUST span tight to loose binding, 6 decades. A box that misses either regime decides the answer by construction — the lesson from the deleted Stage 2"}
+
+# --------------------------------------------------------------------------
+# Deliverable-side quantities. Sensitivity is measured on THESE, not on
+# intermediate model states — the whole point is which parameters move the
+# things that get reported.
+# --------------------------------------------------------------------------
+outputs:
+  - name: persistence_window_width
+    maps_to: R3
+    definition: "width in ERK of the bistable interval between the two folds; 0 if not bistable"
+  - name: coformulation_gap
+    maps_to: R1
+    definition: "double-above-threshold fraction, correlated minus independent per-cell dose, at a stated uptake CV"
+  - name: threshold_dose
+    maps_to: R1
+    definition: "delivered dose at which a metaplastic cell crosses to the acinar basin"
+  - name: time_to_relapse
+    maps_to: R3
+    definition: "time from payload clearance to loss of the acinar state, in units of 1/delta_P (NOT in days — see the clock problem, PHASE2_PARAMETER_BUDGET §1b)"
+
+# --------------------------------------------------------------------------
+# STANDING RULE — convergence accounting. Non-negotiable.
+# A prior diagnostic found failure rates swinging 13x across kappa quintiles and
+# flat across rho. Dropping failures would deplete the sample precisely in the
+# loose-binding regime that R1 exists to probe, and it would look like a clean
+# negative.
+# --------------------------------------------------------------------------
+convergence:
+  log_every_outcome: true
+  report: failure rate as a function of EVERY swept parameter, binned; never a scalar
+  bound: 0.05
+  if_correlated: "state it explicitly and report all results as conditional on convergence"

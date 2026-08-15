@@ -1,0 +1,32 @@
+{
+  "slug": "fig02_persistence_window",
+  "profile": "paper",
+  "written": "2026-08-15T10:20:46+00:00",
+  "git": {
+    "commit": "53fe017d5585d2a538e62c3a7872d81d3efc3090",
+    "branch": "main",
+    "dirty": false
+  },
+  "env": {
+    "python": "3.13.9",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "packages": {
+      "numpy": "2.5.2",
+      "scipy": "1.18.0",
+      "matplotlib": "3.11.1",
+      "pandas": "3.0.5",
+      "sympy": "1.14.0"
+    }
+  },
+  "caption": "Drug-free persistence window. Equilibrium RBPJL vs ERK drive; solid = stable, dashed = saddle. Shaded interval is bistable \u2014 a reverted cell stays reverted with no drug. Panel B projects the saddle's 2-D stable manifold. PLACEHOLDER PARAMETERS: the structure is the result, the numbers are not.",
+  "inputs": {
+    "C:\\Users\\luqma\\adm-insil-des\\results\\gate_b\\branch.csv": "1a94bac8ab593f749a69366671ab888adeda23746c9beaaab404abc723696227",
+    "C:\\Users\\luqma\\adm-insil-des\\results\\gate_b\\branch_labels.csv": "c0177a79792abaf10ddc8f10840d943b8bdddd20931a8bf4068c6357a1d7de8f",
+    "C:\\Users\\luqma\\adm-insil-des\\results\\gate_b\\separatrix.csv": "ff7e9fc8fe41832a3887cbcd6d4dc6957bfb27b1a6dfcee14239be1c86d0c9b2",
+    "C:\\Users\\luqma\\adm-insil-des\\results\\gate_b\\summary.json": "e73e2e6025250ee707cc2aa3c4877f3c0c9c0ac658aa234453faa79ff7b6df13"
+  },
+  "outputs": {
+    "fig02_persistence_window.pdf": "d428aab462f273dbbad5284c17d93f0e4fa649acf38bf06040de92592b9ded55"
+  },
+  "source_csv": "fig02_persistence_window_source.csv"
+}

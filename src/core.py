@@ -11,14 +11,28 @@ STATES
     C   chromatin/memory at metaplasia loci — sets time-to-relapse
 
 INPUTS, prescribed functions of time, never states
-    erk       pERK. Trametinib sets it; on withdrawal it follows a REBOUND
+    erk       **the ERK-driven ID3 level, in units of E_tot** — see the naming
+              note below. Trametinib sets it; on withdrawal it follows a REBOUND
               PROFILE, not a step (decision 002 amendment)
     u_P, u_R  delivered mRNA, as analytic pulses (decision 011)
 
 ALGEBRAIC, never integrated
-    id3       a saturating function of erk
     e_free    the EXACT binding solution (decision 006 amendment) — not
               `E_tot - k*ID3`, which is only its tight-binding limit
+
+NAMING NOTE — `erk` IS `ID3`, AND THAT IS DELIBERATE
+    An earlier version of this docstring promised "`id3`, a saturating function
+    of `erk`". **No such function exists and none is intended.** The input is
+    taken as ID3 directly, proportional to pERK, with the constant of
+    proportionality absorbed into the E_tot scale — which is exactly what makes
+    `kappa = K_d/E_tot` a single group rather than two.
+
+    So the field is called `erk` but carries an ID3 level, and every figure axis
+    must say so. The linearity is not a hidden assumption: it IS the ERK->ID3
+    edge, the one flagged in v3 Part 1.4 as the load-bearing gap, and
+    **Bench Handshake item 8 (ID3 western +/- trametinib) measures precisely this
+    input map.** If that western comes back non-linear or flat, this line is
+    where the model changes.
 
 READ THIS BEFORE EDITING
   * `dR/dt` HAS NO P-INDEPENDENT TERM. That zero is the project's central claim:
@@ -56,6 +70,24 @@ STATES: tuple[str, ...] = ("P", "R", "C")
 #: double-counting trap that argues for `n_C = 1` (see Params.n_C).
 SELF_REINFORCEMENT_EXPONENT = 2.0
 
+#: `eps` above which the C-subsystem is genuinely BISTABLE — i.e. a memory that
+#: holds a written state on its own — rather than a low-pass filter with a lag.
+#: Exact: `max_C d/dC [C^2/(1+C^2)] = 3*sqrt(3)/8 = 0.6495`, so the threshold is
+#: its reciprocal, 1.5396.
+#:
+#: **`default_params()` ships `eps = 0.5`, which is BELOW this.** At the default,
+#: `C` is a filter, not a memory. That is not necessarily wrong — a lagged filter
+#: still delays relapse — but the word "memory" must not be used for it on a
+#: poster, and any prior range for `eps` should straddle this threshold so the
+#: question is tested rather than assumed.
+EPS_MEMORY_THRESHOLD = 8.0 / (3.0 * np.sqrt(3.0))     # = 1.5396
+
+#: Measured boundary of `b_P` below which trametinib alone cannot revert, at the
+#: default parameter set (bisection). See `default_params`. Any sweep or fit that
+#: allows `b_P` below this is exploring a regime the literature has ruled out,
+#: and should say so rather than average over it.
+B_P_CRITICAL = 0.4903
+
 
 # ---------------------------------------------------------------------------
 # Parameters — 12 dimensionless groups
@@ -86,7 +118,10 @@ class Params:
     gamma: float        # delta_C / delta_P — THE DURABILITY KNOB. Profiled.
     alpha_C: float      # write gain
     k_w: float          # ERK half-max for writing, in ID3 units
-    eps: float          # self-reinforcement strength (memory, not filter)
+    eps: float          # self-reinforcement strength. Below EPS_MEMORY_THRESHOLD
+                        # (1.5396) the C-subsystem is a lagged FILTER, not a
+                        # bistable memory — and the default is below it. Do not
+                        # call C a "memory" without checking this value.
 
     # --- binding
     kappa: float        # K_d / E_tot — THE BINDING REGIME. Profiled.
@@ -114,16 +149,22 @@ def default_params() -> Params:
     placeholder until the Phase 0 bench items land; report no number obtained
     from these.
 
-    `b_P = 0.5` is the one value here chosen rather than guessed: below roughly
-    0.4 the model says MEK inhibition **alone** can never restore RBPJL, which
-    contradicts Collins 2014 head-on and would destroy Phase 7's trametinib-only
-    positive control. The default therefore sits in the regime the literature
-    requires — trametinib alone reverts, KRAS-high holds metaplasia, and the
-    drug-free window is bistable — so smoke tests cannot silently run in a regime
-    the project has already ruled out. **A sanity floor, not a calibration.**
+    **`b_P` sits close to a saddle-node and that is a hazard, not a detail.**
+    Below `B_P_CRITICAL` the model says MEK inhibition *alone* can never restore
+    RBPJL — contradicting Collins 2014 and destroying Phase 7's trametinib-only
+    positive control. The measured boundary is **0.4903** (bisection, at this
+    parameter set); an earlier version of this docstring said "roughly 0.4",
+    which is **wrong** — at `b_P = 0.40` trametinib alone leaves `R = 0.18`
+    against a high branch of 3.98, i.e. not reverted.
+
+    The default is set to **0.6**, ~22% above the boundary, rather than the 0.5
+    it previously shipped at — 0.5 is only **2% clear**, and `b_P` is one of the
+    ten *fitted* groups, so any fit or sweep that nudges it down by a couple of
+    percent silently crosses into the forbidden regime while every figure still
+    renders. See `B_P_CRITICAL`.
     """
     return Params(
-        a_P=6.0, b_P=0.5, c_rep=1.0, n_P=3.0,
+        a_P=6.0, b_P=0.6, c_rep=1.0, n_P=3.0,
         a_R=4.0, n_R=3.0, rho=1.0,
         gamma=0.02, alpha_C=1.5, k_w=1.0, eps=0.5,
         kappa=0.01, n_C=1.0,

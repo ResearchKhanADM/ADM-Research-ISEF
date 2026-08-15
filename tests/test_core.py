@@ -348,3 +348,75 @@ def test_withdrawal_relapses_without_a_payload():
     at_withdrawal = R[np.searchsorted(s.t, 600.0)]
     assert at_withdrawal > 0.5, "drug should have reverted the cell first"
     assert R[-1] < 1e-3, "and it should relapse once the drug is withdrawn"
+
+
+# ---------------------------------------------------------------------------
+# Regressions on defects found by the Tier 2 panels (session 6)
+# ---------------------------------------------------------------------------
+
+
+def test_b_P_default_clears_the_saddle_node_with_margin():
+    """`b_P` sits near a boundary the literature forbids crossing.
+
+    Below `B_P_CRITICAL` the model says trametinib ALONE never reverts anything,
+    contradicting Collins 2014 and destroying Phase 7's trametinib-only positive
+    control. The default previously shipped at 0.5 against a measured boundary of
+    0.4903 — **2% of margin on a fitted parameter**, so any sweep nudging it down
+    a couple of percent crossed into the forbidden regime while every figure
+    still rendered.
+
+    The docs also said the boundary was "roughly 0.4", which was wrong: at 0.40
+    trametinib alone leaves R ~ 0.18 against a high branch of ~4.
+    """
+    p = core.default_params()
+    assert p.b_P > core.B_P_CRITICAL * 1.15, (
+        f"b_P = {p.b_P} is within 15% of the critical value "
+        f"{core.B_P_CRITICAL}; a fit or sweep could cross it silently")
+
+
+def test_below_b_P_critical_trametinib_alone_cannot_revert():
+    """Guard-on-the-guard: confirm the boundary is real and in the stated place."""
+    from dataclasses import replace
+    p = core.default_params()
+    below = _settle(replace(p, b_P=core.B_P_CRITICAL * 0.9), 0.05, [0.0, 0.0, 1.5])
+    above = _settle(replace(p, b_P=core.B_P_CRITICAL * 1.1), 0.05, [0.0, 0.0, 1.5])
+    assert below[1] < 0.5, "below the critical b_P, trametinib alone must fail"
+    assert above[1] > 0.5, "above it, trametinib alone must revert"
+
+
+def test_eps_default_is_a_filter_not_a_memory_and_the_code_says_so():
+    """`C` is only a bistable memory above `EPS_MEMORY_THRESHOLD` = 3*sqrt(3)/8.
+
+    The default is below it, so `C` is a lagged filter. That may be acceptable —
+    a filter still delays relapse — but the model must not be *described* as
+    carrying a memory while running here. This test exists so the discrepancy is
+    visible rather than buried in a comment.
+    """
+    assert core.EPS_MEMORY_THRESHOLD == pytest.approx(1.5396, abs=1e-3)
+    assert core.default_params().eps < core.EPS_MEMORY_THRESHOLD
+
+
+def test_chromatin_is_currently_a_strict_cascade():
+    """DOCUMENTS A KNOWN LIMITATION — decision 014, not yet resolved.
+
+    `dC/dtau` depends on the input and on `C`, and on nothing else: not `P`, not
+    `R`, not the payload. So the payload has no channel to the durability
+    endpoint, and Phase 5's dose x interval map would be flat by construction.
+
+    This test asserts the limitation *as it currently stands*, so that whichever
+    fix is chosen (active erasure, or restating Phase 5's endpoint as
+    reachability) **this test must be updated deliberately** rather than the
+    change slipping through unnoticed.
+    """
+    p = core.default_params()
+    base = core.rhs(0.0, np.array([1.0, 1.0, 0.5]), p,
+                    core.Inputs.constant(erk=1.0))[2]
+    for P_ in (0.0, 5.0):
+        for R_ in (0.0, 4.0):
+            got = core.rhs(0.0, np.array([P_, R_, 0.5]), p,
+                           core.Inputs.constant(erk=1.0))[2]
+            assert got == pytest.approx(base, rel=1e-12)
+    dosed = core.rhs(0.0, np.array([1.0, 1.0, 0.5]), p,
+                     core.Inputs.constant(erk=1.0, u_P=10.0, u_R=10.0))[2]
+    assert dosed == pytest.approx(base, rel=1e-12), (
+        "if this now differs, active erasure was added — update decision 014")

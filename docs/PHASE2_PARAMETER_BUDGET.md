@@ -25,26 +25,89 @@ Delivered: **3 states, 12 free groups.** Previous system: 11 states, 61 paramete
 
 ---
 
-## 1 · Why profile likelihood is the deliverable, not a side-quest
+## 1 · The parameter → deliverable mapping — **CLAIM WITHDRAWN, 2026-08-15**
 
-The three parameters chosen for profiling map **one-to-one onto the three
-headline results**:
+> ## ⚠ THIS SECTION PREVIOUSLY ASSERTED A ONE-TO-ONE MAPPING. IT IS NOT TRUE.
+>
+> It read: *`a_P` → R2, `γ` → R3, `κ` → R1, one-to-one; therefore profile
+> likelihood is the uncertainty bar on each deliverable; write it that way in the
+> figure captions.* **Do not write that.** A methods panel measured it and the
+> R1 leg is false in the model as shipped. Two separate problems, recorded
+> together because they were found together — see `docs/decisions/013`.
 
-| Profiled parameter | What it controls | Headline result |
-|---|---|---|
-| **`a_P`** autoregulatory gain | does the loop close | **R2 composition** |
-| **`γ = δ_C/δ_P`** memory timescale | how long it holds | **R3 durability** |
-| **`κ = K_d/E_tot`** binding regime | threshold sharpness | **R1 formulation** |
+**Problem 1 — the mapping is not one-to-one, and κ is not even dominant for R1.**
+R1's co-formulation gap is set by the *bootstrap threshold in delivered dose*,
+which depends on the whole complex `P·E_free·R` — not on the binding term alone.
+A one-at-a-time diagnostic around the placeholder set found `a_R` (**not
+profiled**) moving the gap far more than `κ` does over `κ`'s own declared range,
+and `n_P` (**a scanned exponent, not a fitted parameter**) able to abolish the
+conversion entirely, while `κ` is nearly flat across its first three decades.
 
-That is not a coincidence to bury in a methods section. It means **profile
-likelihood is the uncertainty bar on each deliverable**, not an identifiability
-exercise run alongside them. Write it that way in the figure captions: the
-profile on `κ` *is* the error bar on the co-formulation gap.
+The irony is instructive: **`core.py`'s own `n_eff` docstring and §4.4 below
+already say the convolved quantity is `P·E_free·R` and that its sharpness
+compounds `n_P`/`n_R`.** The 1.34→0.5 correction was found by exactly that
+reasoning, and then this section was written contradicting it. *A claim can be
+refuted by a file in the same repository.*
 
-It also answers the standing attack cleanly. *"None of your parameters are
-measured"* — correct, and **each unmeasured parameter has a named consequence and
-a computed interval**. That is a stronger position than a fitted point estimate
-with no interval at all.
+**Problem 2 — a parameter interval is not a deliverable interval anyway.** R1 is
+a percentage gap, R2 a marginal-value curve, R3 a window in days. An interval on
+`κ` becomes an interval on R1 only by pushing it through the Phase 3 computation,
+a nonlinear map depending on the other eleven groups. Even a *correct* interval
+on `κ` would not be R1's error bar without that propagation.
+
+**What replaces it.** Global sensitivity analysis (Sobol) of each deliverable
+against every group, which settles the mapping by measurement instead of
+assertion — pre-registered, then run. Until it has run, the defensible phrasing is
+**"the dominant single contributor to"**, and only where the sensitivity analysis
+supports even that. See `prereg/2026-08-15_phase2_sensitivity_*`.
+
+**And the profiling itself is separately misnamed** — there is no data, so there
+is no likelihood. See §1a.
+
+## 1a · "Profile likelihood" is not available, and the gate depends on it
+
+Profile likelihood needs a likelihood — a density for **observed data** — plus
+re-optimisation of the nuisance parameters at each fixed value of the profiled
+one, plus a Wilks threshold. **This project has no data.** Building a Gaussian
+penalty around two published timings with tolerances chosen by the modeller is
+not a likelihood; it is the **same error as v3 §0.7's "stability selection"**
+(a data-based method's name applied to a data-free operation on parameter space),
+and it belongs in that table rather than in a caption.
+
+Measured consequence, from the panel: the resulting "interval" is **the prior box
+itself** for `a_P` and `γ` — 100% of the declared range — and where it is not,
+**halving the invented tolerance changed it from 100% to 67% of the box**.
+Nothing about the published observations changed. The width is a function of a
+number the modeller typed.
+
+**There is a real result in there, and it is the diagnosis rather than the
+number:** a flat profile is the textbook signature of **structural
+non-identifiability**. *"These parameters are not identifiable from the available
+published observations"* is correct, correctly named, and useful.
+
+**⚠ Gate B is currently unpassable as worded.** v3 defines it as *"key parameters
+surviving profile likelihood"* — a gate defined in terms of a method that cannot
+be run, which fails for reasons unrelated to the model. Rewording it is a **Tier 3
+question** (it changes what an endpoint means) and is in this session's batch.
+
+## 1b · The model has no clock — and this reaches Phase 5
+
+Time is `τ = t·δ_P`. **`δ_P` — the PTF1A protein turnover rate — was absorbed by
+the nondimensionalisation, is not one of the 12 groups, and is not on Bench
+Handshake #1.** CLAUDE.md's own limitations say there is no measured PTF1A
+half-life.
+
+So any observation quoted in **days** requires reintroducing `δ_P` as a 13th
+unknown, and because it multiplies every predicted time identically, *k*
+day-valued timings supply only *k−1* dimensionless constraints. **Collins' two
+timings therefore give one constraint — the ratio ~7/3 — and one of them is
+consumed setting a clock nobody has measured.**
+
+**This is not only a Phase 2 problem. Phase 5's deliverable is a redosing interval
+in hours or days, and it has no units without `δ_P`.** v3 says bench items 3 and 4
+give those axes units; they do not — mRNA half-life constrains a *product* of
+dimensionless groups, not the protein clock. **Bench Handshake #1 gains item 9:
+PTF1A protein half-life by cycloheximide chase.**
 
 ---
 
