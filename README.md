@@ -1,4 +1,6 @@
-# ADM-Research — reversing KRAS-driven acinar-to-ductal metaplasia in silico
+# ADM-Research-ISEF — reversing KRAS-driven acinar-to-ductal metaplasia in silico
+
+<https://github.com/ResearchKhanADM/ADM-Research-ISEF>
 
 Acinar-to-ductal metaplasia (ADM) is the earliest and, in principle, still
 reversible step on the path from a healthy pancreas to pancreatic cancer.

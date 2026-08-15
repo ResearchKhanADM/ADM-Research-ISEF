@@ -86,3 +86,25 @@ scanpy 1.12.3 · pyyaml 6.0.3
    deleting or moving them so a future session cannot pick one up by accident.
 3. **No `gh` CLI installed.** Not needed for anything so far; push works over
    HTTPS. Flagging only so it is not a surprise later.
+
+---
+
+## 2026-08-15 · Session 2 — Stage 0, part 1: write the unreduced system
+
+### Housekeeping
+
+- **The GitHub remote moved.** Old:
+  `khanluqmaanresearch-byte/ADM-Research`. New:
+  **`ResearchKhanADM/ADM-Research-ISEF`**. Luqmaan ran `git remote set-url`,
+  corrected `user.name` / `user.email`, and force-pushed before this session.
+  Verified here: `git fetch` then compared SHAs directly rather than trusting
+  the tracking ref — local and remote `main` are both `40bdaa4`. In sync, and
+  both session-1 commits survived the force-push. The session-1 log entry above
+  still names the old URL **on purpose**: it records what was true that day, and
+  a log that gets edited to match the present is not a log.
+- Repo URL updated in `CLAUDE.md` and `README.md`.
+- PubMed and bioRxiv MCP servers confirmed live by real calls, not just by
+  loading schemas. PubMed round-tripped PMID 24315826 and returned the exact
+  citation the master plan gives for Collins 2014 — *Gastroenterology*
+  146(3):822–834.e7, doi 10.1053/j.gastro.2013.11.052. That is one independent
+  check on the plan's most load-bearing reference.

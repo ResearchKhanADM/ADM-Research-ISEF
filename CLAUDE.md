@@ -6,7 +6,7 @@ The wet-lab experiment runs in the same cycle and gets **one shot, no iteration*
 Full plan: `docs/ADM_INSILICO_MASTER_PLAN.md`. **Read it before proposing anything.**
 Running log: `docs/PROGRESS.md`. Read the last entry at the start of every session.
 
-Repo: https://github.com/khanluqmaanresearch-byte/ADM-Research (public)
+Repo: https://github.com/ResearchKhanADM/ADM-Research-ISEF (public)
 
 ## Layout
 
