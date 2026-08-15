@@ -1,9 +1,9 @@
 # Pre-registration · Phase 2 global sensitivity analysis
 #
-# TEMPLATE + PROPOSED RANGES. Claude writes the structure and proposes the box;
-# LUQMAAN CONFIRMS OR EDITS IT, and Luqmaan writes the prediction file. The sweep
-# does not run until both are committed AND PUSHED — the pushed timestamp is the
-# proof, and it is the only thing that makes the result mean anything later.
+# CONFIRMED. Claude proposed the box; Luqmaan confirmed it and wrote the
+# predictions. The sweep does not run until both files are committed AND PUSHED —
+# the pushed timestamp is the proof, and it is the only thing that makes the
+# result mean anything later.
 #
 # WHY THIS SWEEP EXISTS
 # `docs/PHASE2_PARAMETER_BUDGET.md` §1 asserted that a_P -> R2, gamma -> R3 and
@@ -13,23 +13,40 @@
 # this analysis replaces assertion with measurement.
 #
 # METHOD: Sobol variance decomposition (Saltelli sampling, SALib), first-order
-# and total-order indices, for EACH deliverable against ALL 12 groups. Total-order
-# is the one that matters here — it captures interaction effects, and the whole
-# question is whether a parameter's influence is direct or routed through others.
+# and total-order indices, for EACH deliverable. Total-order is the one that
+# matters here — it captures interaction effects, and the whole question is
+# whether a parameter's influence is direct or routed through others.
+# STRATIFIED over the two Hill exponents; see `method.strata` below.
 
 name: phase2_sensitivity
 date: 2026-08-15
-status: TEMPLATE — NOT YET CONFIRMED, NOT YET RUN
+status: CONFIRMED by Luqmaan 2026-08-15. Predictions in the companion _prediction.md.
 
 method:
   estimator: sobol            # first-order S1 and total-order ST
   sampler: saltelli
-  n_base: 1024                # total evaluations = n_base * (2*D + 2)
+  n_base: 1024                # total evaluations = n_base * (2*D + 2) PER STRATUM
   seed: 20260815
+  # STRATIFIED — see the _prediction.md section "P5 and P6 contradict each other".
+  # Sobol runs over the 10 CONTINUOUS groups only. n_P and n_R are a stratum
+  # label, not an uncertain input: sampling them would convert a declared scan
+  # into a prior, which decision 004 deliberately refused. P6 then holds by
+  # construction and stays a live implementation check.
+  sobol_inputs: [a_P, b_P, c_rep, a_R, rho, gamma, alpha_C, k_w, eps, kappa]
+  strata:
+    n_P: [1.0, 2.5, 4.0]
+    n_R: [1.0, 2.5, 4.0]
+  # Integration horizon MUST scale with 1/gamma. A fixed horizon manufactures
+  # failures in the slow-memory regime, which is exactly where P3 is tested; a
+  # prior diagnostic saw 25.8% failures in the slowest gamma quintile from this
+  # cause alone.
+  horizon_rule: "t_end = max(4000, 40 / gamma)"
 
 # --------------------------------------------------------------------------
-# PROPOSED prior box. Log-uniform unless stated. LUQMAAN: confirm or edit.
-# Rationale for each is stated so the choice is auditable rather than defaulted.
+# The prior box, CONFIRMED. Log-uniform unless stated. Rationale for each is
+# stated so the choice is auditable rather than defaulted.
+# n_P and n_R appear here for their RANGES ONLY — they are scanned as strata, not
+# sampled as Sobol inputs (`method.sobol_inputs`).
 # --------------------------------------------------------------------------
 parameters:
   a_P:     {low: 1.0,   high: 40.0,  scale: log,     why: "autoregulatory gain; must span below and above the fold or bistability is assumed rather than tested"}

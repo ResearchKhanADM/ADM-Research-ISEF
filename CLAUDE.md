@@ -81,6 +81,18 @@ compression:** 6 → Phase 4's simplex interior → Phase 5's ordering arms.
   guard-on-the-guard (construct the violating version, require it to fail), plus a
   dynamic companion: `R` must not rise from zero while `P` is held at zero.
 
+## ⚠ THE INTEGRITY FORK — standing answer, never a case-by-case call
+
+When a promised output turns out not to be producible by the model, and the choice
+is **(a)** add an unmeasured mechanism to produce it, or **(b)** restate the
+deliverable honestly — **ALWAYS TAKE (b).**
+
+**Never add an unmeasured mechanism to preserve a promised figure, number, or
+claim.** Strike the output, state why, and pre-register the mechanism as an
+extension with what would justify it. Hit twice already: the active-erasure term
+(decision 014) and `fig05_durability` (decision 015). **If taking (b) ever seems
+wrong, THAT is the Tier 3 question** — not the fork itself.
+
 ## ⚠ IF A CHECK COSTS LESS THAN THE ROUND-TRIP, RUN THE CHECK FIRST
 
 **If a computation could make a Tier 3 question moot, it is Tier 1 — regardless of
@@ -105,8 +117,16 @@ dimensionless groups, not the protein clock.
 
 **T1 · decide alone, log one line in `PROGRESS.md`, keep going.** Implementation,
 functional forms with a defensible default, naming, test design, refactors that
-keep tests green, anything reversible in under a day. **Don't ask, don't batch —
-just log.**
+keep tests green, anything reversible in under a day. Plus these three, which are
+**not** to be asked about:
+- **A framing or claim Luqmaan gave you that the repo refutes** — withdraw it, log
+  it, list it in the session report.
+- **A previously reported number that changes** — change it, log it, list it under
+  *changed a previously reported number*. **Never silently.**
+- **A figure the plan promises that the model cannot produce** — strike it with the
+  reason, and state what a valid replacement would have to show.
+
+**Don't ask, don't batch — just log.**
 
 **T2 · convene a panel, decide, write the file, keep going.** Anything
 architectural: state-space change · new or removed parameter · a changed
@@ -119,12 +139,10 @@ from `.claude/agents/` (`adversarial-reviewer`, `methods-checker`,
 them**, standing instruction). Then `docs/decisions/NNN-name.md`, four headings,
 *what would reverse this* checkable. Report it as **DECIDED-PENDING-REVIEW**.
 
-**T3 · STOP AND ASK. Never automated.** (a) anything encoding Luqmaan's scientific
-priority rather than a technical fact — what he trades off, what risk he accepts,
-what an endpoint means · (b) anything consuming or constraining the one wet-lab
-shot · (c) external facts unobtainable here (arm budget, bench measurements,
-anything needing a person) · (d) wrong is expensive **and** irreversible · (e) any
-claim of novelty or priority.
+**T3 · STOP AND ASK — and the list is now short.** **Pre-registration content** (his
+beliefs, never yours) · **external facts** (arm budget, bench measurements) ·
+**trade-offs against his stated priorities** · **any novelty or priority claim**.
+Everything else: decide, log, continue.
 **BATCH THEM.** Don't stop at the first — carry on with everything unblocked and
 present them numbered at session end, each with a recommendation and the cost of
 each option. If one blocks *everything*, stop and **say it is a hard block**, and
@@ -133,6 +151,19 @@ what you tried first.
 **The decisions folder is the interface** — Luqmaan reads files, not transcripts.
 Every T2 file stands alone: stake, options, choice, reversal condition, downstream
 effect. **If it needs the conversation to be understood, it is not finished.**
+
+## ⚠ CONTEXT DISCIPLINE — Claude's context fills faster than Luqmaan's time
+
+**Session start: read `CLAUDE.md`, the last `PROGRESS.md` entry, and
+`docs/decisions/INDEX.md`.** Open a full decision file only when it bears on the
+task in hand. **Never load the folder.**
+
+**Keep `INDEX.md` current in the same commit as any new or retired decision.** An
+index that drifts is worse than no index.
+
+**When context is filling, do not degrade.** Write full state to `PROGRESS.md`,
+commit, push, and say plainly that a fresh session should start. A clean handoff
+beats a long session that starts forgetting the cut list.
 
 ## Hard rules
 

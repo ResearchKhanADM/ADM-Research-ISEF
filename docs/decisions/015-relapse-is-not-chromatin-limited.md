@@ -4,6 +4,16 @@
 *Evidence:* `results/relapse_mechanism/` — three independent tests, run before
 answering the question they were attached to.
 
+## ⚠ THE HEADLINE CAVEAT — say this when anyone asks what would make us wrong
+
+**R3 holds conditional on `C` being a lagged filter rather than a bistable memory. The boundary is `ε = 1.54`. The pre-registered sweep straddles it. If the plausible range for `ε` sits above 1.54, `C` can hold its own state after withdrawal and re-suppress the acinar program, and R3 inverts.**
+
+It is named, it is bounded by a number, and it will be tested by a
+sweep registered before it runs. That is the whole answer to *"what would
+reverse your conclusion?"* — not a hedge, a coordinate.
+
+---
+
 **Read this instead of the transcript.** It retires decision 014's question,
 **and it contradicts the R3 reframing Luqmaan proposed in the same message.**
 

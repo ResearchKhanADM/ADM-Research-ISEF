@@ -46,12 +46,23 @@ READ THIS BEFORE EDITING
   * Viability is NOT modelled (decision 008 retired). `chop_flag()` is a warning
     on the output, not a term in the right-hand side.
 
-The three profiled parameters map one-to-one onto the three headline results:
-    a_P    does the loop close    -> R2 composition
-    gamma  how long it holds      -> R3 durability
-    kappa  threshold sharpness    -> R1 formulation
-So profile likelihood is not an identifiability side-quest — it is the
-uncertainty bar on each deliverable. See `docs/PHASE2_PARAMETER_BUDGET.md`.
+⚠ WITHDRAWN CLAIM — this docstring previously asserted that `a_P`, `gamma` and
+`kappa` map one-to-one onto R2, R3 and R1, and that profile likelihood is
+therefore "the uncertainty bar on each deliverable". **Both halves are false and
+both are withdrawn** (decisions 013 and 015):
+
+  * the mapping fails for R1 — `a_R`, which is not profiled, and `n_P`, a
+    *scanned* exponent, both move the co-formulation gap more than `kappa` does
+    over `kappa`'s own range. The convolved quantity is `P*E_free*R`, as the
+    `n_eff` docstring below already said;
+  * `gamma` fails for R3 — `d ln t_relapse / d ln gamma` measures ~0 above the
+    fold; relapse is a fast (P,R) collapse, not a chromatin clock;
+  * and there is no data, so there is no likelihood to profile.
+
+**This paragraph outlived its own retraction by one commit, in the module every
+other file imports** — the exact failure mode the project had just documented.
+Left as a marked correction rather than deleted, because a silently-removed
+false claim teaches nothing.
 """
 
 from __future__ import annotations
