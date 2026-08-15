@@ -666,3 +666,80 @@ cannot be run at all. See decision 013 and T3 question 1.**
 4. `fig01_loop_schematic`; `figS0x` for the fold locus.
 
 ### Open questions — batched for Luqmaan, see the session report
+
+---
+
+## 2026-08-15 · Session 7 — the check that dissolved the question
+
+New standing rule in effect: **if a check costs less than the round-trip, run the
+check first.** Applied immediately to the question it was written for.
+
+### T1 · the check, run before asking (`results/relapse_mechanism/`)
+
+**Relapse is NOT chromatin-limited.** Three independent tests, zero solver
+failures, all times in `1/δ_P`:
+
+- `d ln t_relapse / d ln γ` = +0.001 to +0.066 at post-withdrawal ERK ≥ 0.9. If
+  `C` were the clock it would be −1.
+- **Freezing `C`** changes relapse timing by ≤3.6% at ERK ≥ 0.9, and 0.0% at ERK
+  ≥ 1.2.
+- **Varying written memory 40-fold** before withdrawal gives relapse times
+  identical to the digit: 4.6, 4.6, 4.6, 4.6.
+
+`C` matters only in a narrow band just above the fold (ERK ≈ 0.72–0.90), where
+freezing it prevents relapse entirely. **It is a boundary layer, not the clock.**
+
+### T2 · DECIDED-PENDING-REVIEW
+
+- **[015 · relapse is not chromatin-limited](decisions/015-relapse-is-not-chromatin-limited.md)** —
+  and **it contradicts the proposed R3 reframing.** "Durability is set by drug-hold
+  duration" does not survive: drug-hold acts on relapse only through `C` at
+  withdrawal, and relapse timing is flat in that. The half that survives is that
+  payload composition does not set durability. **R3 becomes a threshold claim** —
+  durability is decided by whether post-withdrawal drive sits inside the
+  persistence window, and nothing the payload or schedule does moves that window.
+  More falsifiable, not less: it predicts durability is all-or-nothing in KRAS
+  level and **flat in payload dose**, which one experiment can refute.
+- **[014 retired as moot](decisions/014-chromatin-is-a-strict-cascade.md)** —
+  the cascade is real, the question it posed does not arise. No parameter added;
+  budget stays at 12.
+- **Gate B reworded** (retiered to T2 as instructed): "separatrix located by
+  continuation, and the fold loci bounding the bistable window reported with the
+  prior-predictive spread of the persistence window." Structural half **met**.
+
+### Changed a previously reported number / claim
+
+- **R3's statement changed** in v3 Part 1.3 — from a persistence *window* framing
+  to a *threshold* claim, with the three things it rules out stated as measured.
+- **`fig05_durability` is not producible by this model** and is struck from v3
+  Part 5. Relapse timing is flat in both dose and drug-hold; a three-region dose ×
+  interval map would be stripes. R3 is carried by `fig02`.
+- **`fig02` recaptioned**: a **two-protocol operating window**, explicitly *not* a
+  two-parameter bifurcation diagram.
+- **Bench item 9 promoted to equal priority with item 8.**
+
+### Standing rules added to CLAUDE.md
+
+1. **Run the cheap check before asking.** If a computation could make a T3
+   question moot, it is T1 regardless of what it is attached to.
+2. **Time is dimensionless until item 9 lands.** Every timing in `1/δ_P`, every
+   time axis labelled `1/δ_P`, **no placeholder conversions, not even in drafts.**
+3. **Check a handed-down framing against the code before adopting it** — the
+   `a_P`→R2 mapping was contradicted by `core.py`'s own docstring before it was
+   written down.
+4. Rewording a gate or deliverable is **T2**, not T3, when the wording, reasoning
+   and cost are in hand.
+
+### Next
+
+- Gate B second half: fold loci (continuation, not a sweep — proceeds now) and
+  the prior-predictive spread (**blocked on the Sobol prereg**).
+- Re-run the 015 tests at `ε = 2.0` inside the pre-registered sweep — a genuinely
+  bistable `C` is the single most likely reverser of 015 and the `ε` range must
+  straddle 1.5396.
+- `fig01_loop_schematic`.
+
+### Open questions
+
+None new. Outstanding and Luqmaan's: the Sobol predictions (blocking that sweep),
+and the arm budget (blocking Phase 4).

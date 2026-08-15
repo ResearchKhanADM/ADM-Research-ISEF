@@ -1,7 +1,11 @@
 # 014 · `C` is a strict cascade — the payload cannot reach the durability endpoint
 
-*Date:* 2026-08-15 · *Status:* **Tier 2 finding recorded; the choice between the
-two fixes is a TIER 3 QUESTION and is batched, not decided here.**
+*Date:* 2026-08-15 · *Status:* **RETIRED AS MOOT, same day, by decision 015.**
+The finding below is correct — `C` really is a strict cascade — but the question
+it poses does not arise, because relapse turns out **not to be chromatin-limited**
+at all. Neither fix is adopted; no parameter is added; the budget stays at 12.
+Read `015-relapse-is-not-chromatin-limited.md` first. Preserved unedited because
+the cascade property is still true and still worth knowing.
 *Panel:* adversarial-reviewer mandate, arguing against the proposed handling of
 the (KRAS × trametinib) plane. It found this instead, which is more important
 than the question it was asked.

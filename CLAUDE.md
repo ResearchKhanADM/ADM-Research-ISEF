@@ -81,6 +81,26 @@ compression:** 6 → Phase 4's simplex interior → Phase 5's ordering arms.
   guard-on-the-guard (construct the violating version, require it to fail), plus a
   dynamic companion: `R` must not rise from zero while `P` is held at zero.
 
+## ⚠ IF A CHECK COSTS LESS THAN THE ROUND-TRIP, RUN THE CHECK FIRST
+
+**If a computation could make a Tier 3 question moot, it is Tier 1 — regardless of
+what it is attached to.** Run it, then ask the question that survives. A question
+Luqmaan answers that turns out to be moot costs both of us more than the check
+did. Never write "cheaper than either fix, recommend running this first" and then
+wait; that sentence *is* the instruction to run it.
+
+## ⚠ TIME IS DIMENSIONLESS UNTIL BENCH ITEM 9 LANDS
+
+Time is `τ = t·δ_P`, and `δ_P` — PTF1A protein turnover — is **absorbed by the
+nondimensionalisation and unmeasured**. So **the model has no clock.**
+
+**Report every timing in units of `1/δ_P`. Label every time axis `1/δ_P`. No
+placeholder conversion to hours or days, not even in drafts.** Converting requires
+a measured PTF1A protein half-life — **Bench Handshake item 9, now equal in
+priority to item 8**: it is what makes the schedule deliverable quotable at all.
+Item 4 (mRNA half-life) does not cover it — that constrains a product of
+dimensionless groups, not the protein clock.
+
 ## ⚠ DECISION TIERS — reference: `docs/DECISION_PROTOCOL.md`
 
 **T1 · decide alone, log one line in `PROGRESS.md`, keep going.** Implementation,
@@ -91,7 +111,9 @@ just log.**
 **T2 · convene a panel, decide, write the file, keep going.** Anything
 architectural: state-space change · new or removed parameter · a changed
 functional form **that alters a reported number** · method substitution ·
-a conflict between two documents. Spawn **2 subagents with opposing mandates**
+a conflict between two documents · **rewording a gate or a deliverable when the
+correct wording, the reasoning and the cost are all in hand**. Spawn **2 subagents
+with opposing mandates**
 from `.claude/agents/` (`adversarial-reviewer`, `methods-checker`,
 `literature-verifier` — the last **re-derives constants rather than inheriting
 them**, standing instruction). Then `docs/decisions/NNN-name.md`, four headings,
@@ -137,6 +159,11 @@ polynomials, compound-Poisson dose, Bliss independence) in chat. Clear over clev
 recommendations and costs · what broke · what is next · **anything that changed a
 previously reported number** — not optional; the `n_eff` correction had reached
 five documents before it was caught. Append to `docs/PROGRESS.md` and push.
+
+**6. When Luqmaan hands you a framing, check it against the code before adopting
+it.** The `a_P`→R2 / `γ`→R3 / `κ`→R1 mapping was contradicted by `core.py`'s own
+`n_eff` docstring, in this repository, before it was written down. His framings
+get the same verification as anyone's — that is what he asks for.
 
 ## ⚠ STANDING RULE — never silently drop a failed solve
 

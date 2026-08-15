@@ -16,6 +16,18 @@ decorative figure with no job; here it is the deliverable, and Panel B is what
 makes "the reverted state is a real attractor with a real basin" visible rather
 than asserted.
 
+**This is NOT a two-parameter bifurcation diagram and must not be captioned as
+one.** For equilibria the (KRAS × trametinib) plane is degenerate: both act
+through a single scalar, so iso-contours are hyperbolae and the second axis
+carries no independent information. A genuine two-parameter figure does exist —
+the withdrawal protocol has independent drug-on and drug-off levels — but it is a
+**two-protocol operating window**. Presenting the degenerate version as the money
+figure would be dismantled by anyone who noticed.
+
+**NO TIME AXIS APPEARS HERE.** When one does, it is labelled `1/δ_P`: the model
+has no clock until Bench Handshake item 9 (PTF1A protein half-life) lands, and no
+placeholder conversion to hours is permitted, including in drafts.
+
 CONVENTION NOTE. Project grammar is *solid line = model, open marker = data*.
 Within a model, stable and unstable branches are distinguished solid vs dashed —
 the universal bifurcation-diagram convention, and a distinction between two kinds
@@ -88,7 +100,13 @@ def build(profile="draft"):
                         linestyle=(0, (2, 3)), zorder=0)
 
         axA.set_xlim(0, 1.4)
-        axA.set_xlabel("ERK drive (KRAS × trametinib enter only here)")
+        # Honest axis: for EQUILIBRIA, KRAS and trametinib act through this one
+        # scalar, so a (KRAS x trametinib) plane would be degenerate — iso-
+        # contours are hyperbolae and a "two-parameter bifurcation" there is one
+        # parameter re-plotted. The genuine second axis is the withdrawal
+        # protocol (drug-on vs drug-off levels), which is a two-protocol
+        # operating window, not a bifurcation diagram.
+        axA.set_xlabel("ERK drive — KRAS and trametinib act only through this scalar")
         axA.set_ylabel("RBPJL at equilibrium")
         axA.set_title("A · reversion persists at zero drug")
         axA.text(0.5 * (lo + hi), axA.get_ylim()[1] * 0.93,
@@ -155,8 +173,10 @@ def build(profile="draft"):
                 "Drug-free persistence window. Equilibrium RBPJL vs ERK drive; "
                 "solid = stable, dashed = saddle. Shaded interval is bistable — "
                 "a reverted cell stays reverted with no drug. Panel B projects "
-                "the saddle's 2-D stable manifold. PLACEHOLDER PARAMETERS: the "
-                "structure is the result, the numbers are not."),
+                "the saddle's 2-D stable manifold. NOT a two-parameter "
+                "bifurcation diagram: KRAS and trametinib act through one scalar. "
+                "PLACEHOLDER PARAMETERS: the structure is the result, the numbers "
+                "are not."),
             source=source,
         )
     return True

@@ -125,7 +125,9 @@ PTF1A works as a trimer: PTF1A + an E-protein (E47/HEB) + RBPJL. PTF1-L drives *
 
 **R2 — Composition.** How many components, at what ratio, under a fixed total mRNA mass. Stated as a number with a marginal-value curve: *"two components; the third buys under X% of durable reversal for 33% of the mass budget."*
 
-**R3 — Durability.** The drug-free persistence window — the region of parameter and dose space where the reverted state survives trametinib withdrawal. **This is what the bifurcation diagram is for.** In the old plan the hysteresis wedge was a decorative figure with no job; here it is the answer.
+**R3 — Durability.** *(restated v3.2 — see decision 015, which measured what actually sets relapse.)* **Durability is a threshold property of the post-withdrawal KRAS drive, not a graded property of dose or schedule. The payload buys the crossing; whether it sticks is decided by whether the drive sits inside the persistence window — and nothing the payload or the schedule does moves that window.** **This is what the bifurcation diagram is for.** In the old plan the hysteresis wedge was a decorative figure with no job; here it is the answer.
+
+Three things this rules out, all measured rather than assumed: relapse is **not** chromatin-limited (`d ln t_relapse / d ln γ ≈ 0`, and freezing `C` changes relapse timing by <4%); **drug-hold duration does not set durability** (relapse timing is identical across a 40-fold range of chromatin written before withdrawal); and **payload composition does not set it either**. What the claim gains from this is falsifiability — it predicts durability is **all-or-nothing in KRAS level and flat in payload dose**, which one experiment can refute.
 
 Everything else in the plan is in service of these three.
 
@@ -184,7 +186,7 @@ A design that degrades gracefully across tiers is worth more than one that is op
 | 8 | **ID3 by western, ± trametinib** | **Phase 5 — decides whether it means anything** | *added v3.1.* **High value, one western.** Tests the ERK→ID3 edge, the single assumption Phase 5's ordering prediction rests on. If trametinib does not lower ID3 here, trametinib-first loses its mechanistic basis |
 | 9 | **PTF1A protein half-life** (cycloheximide chase) | **Phase 2's clock AND Phase 5's redosing axis** | *added v3.2.* **The model has no clock without it.** Time is nondimensionalised by `δ_P`, which is absorbed into the scaling and unmeasured — so every predicted duration is in arbitrary units. Two consequences: published day-valued timings collapse to *k−1* usable constraints (Collins' two give one ratio), and **Phase 5's redosing interval cannot be quoted in hours**. Item 4 does *not* cover this: mRNA half-life constrains a product of dimensionless groups, not the protein clock |
 
-Items **3** and **8** are the ones to chase hardest: 3 is the only input to the strongest result and no literature value substitutes for it; 8 is cheap and decides the fate of a whole phase. **Item 9 was missed until the Phase 2 core was built** — it is the difference between a redosing interval and a redosing number.
+Items **3**, **8** and **9** are the ones to chase hardest: 3 is the only input to the strongest result and no literature value substitutes for it; 8 is cheap and decides the fate of a whole phase. **Item 9 was missed until the Phase 2 core was built, and it is now equal in priority to item 8**: it is what makes the schedule deliverable quotable at all. Until it lands, every timing result is reported in units of `1/δ_P` and no conversion is attempted.
 
 ## PHASE 1 · Candidate generation — 2 weeks · parallel with Phase 2
 
@@ -236,7 +238,7 @@ Model it as a **prescribed, parameterized input curve** — rise time, overshoot
 
 **Deliverables:** the P–R bootstrap threshold as a function of free E47; the **two-parameter bifurcation in (KRAS × trametinib) reframed as the drug-free persistence window**; identifiability on the three parameters that matter; and the signed ordering prediction (below).
 
-**GATE B (end of week 6):** two stable states plus a saddle, with an identifiable separatrix, in a model whose key parameters survive profile likelihood.
+**GATE B (end of week 6)** *(reworded v3.2 — the old wording, "key parameters survive profile likelihood", defined the gate by a method that cannot be run without data and was therefore a permanently failed gate; see decision 013)*: **two stable states plus a saddle, separatrix located by continuation, and the fold loci bounding the bistable window reported with the prior-predictive spread of the persistence window.** The structural half is **met** — see `results/gate_b/`.
 
 ## PHASE 3 · Delivery layer — 3 weeks · ★ THE HEADLINE RESULT
 
@@ -313,7 +315,7 @@ The model makes a **signed, falsifiable prediction**: PTF1A mRNA delivered while
 |---|---|---|---|---|
 | 0 · Decision spec | 1 | — | — | Arm budget, endpoints, viability floor |
 | 1 · Candidate generation *(parallel)* | 2 | — | **A: recovers PTF1A/RBPJL/BHLHA15?** | **Layer 1 payload → order mRNA** |
-| 2 · Minimal core | 4 | 0 | **B: bistable + identifiable?** | Persistence window |
+| 2 · Minimal core | 4 | 0 | **B: bistable + separatrix + fold loci?** | Persistence window |
 | 3 · Delivery layer ★ | 3 | 2, bench CV | — | **Formulation + ratio** |
 | 4 · Mixture design | 2 | 1, 2, 3 | — | **Layer 2 payload: count + split** |
 | 5 · Durability + schedule | 2 | 3, 4, bench PK | — | **Redosing interval + order** |
@@ -367,6 +369,8 @@ make_figures.py      the single command
 
 **Global grammar, fixed once:** a **solid line is a model**; an **open marker with a dark edge is data**. Never connect experimental points with a line.
 
+**⚠ TIME AXES ARE DIMENSIONLESS** *(v3.2)*. Time is `τ = t·δ_P` and `δ_P` — PTF1A protein turnover — is absorbed by the nondimensionalisation and **unmeasured**. **Every time axis is labelled `1/δ_P`, and no placeholder conversion to hours or days appears anywhere, including in drafts.** Converting requires Bench Handshake item 9. Quoting a schedule in hours before that lands would be manufacturing units.
+
 **Provenance.** Every stage calls `stamp_run()` writing git commit + dirty flag, seed, versions, and SHA-256 of every output. Every figure declares inputs; `save_figure()` hashes them and writes `<slug>.prov.json` and `<slug>_source.csv`. **`paper` and `poster` profiles refuse to render from a dirty tree.** `make_figures.py --check` fails if anything is stale.
 
 **The core figures:**
@@ -374,10 +378,10 @@ make_figures.py      the single command
 | Slug | Phase | What it shows |
 |---|---|---|
 | `fig01_loop_schematic` | — | The reduced 3–4 node core. Not all thirteen states. |
-| `fig02_persistence_window` ★ | 2 | (KRAS × trametinib), bistable wedge shaded + hatched, labelled **"reversion persists at zero drug"**. The headline. |
+| `fig02_persistence_window` ★ | 2 | **A two-protocol operating window in (`erk_high`, `erk_drug`) — NOT a two-parameter bifurcation diagram** *(corrected v3.2)*. For equilibria, KRAS and trametinib act through **one scalar**, so that plane is degenerate and iso-contours are hyperbolae; a "two-parameter bifurcation" there is one parameter re-plotted. The genuine second axis comes from the **withdrawal protocol**, where drug-on and drug-off levels are independent. Bistable interval shaded, both folds marked, labelled **"reversion persists at zero drug"**. The headline. |
 | `fig03_formulation` ★ | 3 | Double-above-threshold fraction vs uptake CV, co-formulated vs separate particles. Two curves, one gap, one recommendation. |
 | `fig04_marginal_value` ★ | 4 | Best durable reversal vs payload size under fixed mass. Knee marked. Ensemble drawn, not a single curve. |
-| `fig05_durability` | 5 | Time-to-relapse after clearance; dose × interval three-region map. |
+| `fig05_durability` | 5 | ~~Time-to-relapse after clearance; dose × interval three-region map.~~ **NOT PRODUCIBLE by this model** *(v3.2, decision 015)*: relapse is not chromatin-limited, and relapse timing is flat in both payload dose and drug-hold duration. R3 is carried by `fig02`. Any replacement must show the **threshold in post-withdrawal drive**, not a graded dose response. |
 | `fig06_heldout` | 6 | Prediction interval vs published numbers, with the prediction box **dated and placed left of the outcome box**. |
 | `fig07_prioritization` | 1 | Ranked regulon activity across ≥2 datasets, labelled as a positive control. |
 | `figS0x_*` | — | Profile likelihood, QSSA error, CellOracle negative control. |
