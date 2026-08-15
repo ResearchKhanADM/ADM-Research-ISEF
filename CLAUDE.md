@@ -1,12 +1,32 @@
-# ADM Reversal — in-silico project
+# ADM durability — in-silico project
 
-**Goal: reverse KRAS-driven acinar-to-ductal metaplasia while keeping the cells alive.**
-The wet-lab experiment runs in the same cycle and gets **one shot, no iteration** — this model exists to design it, and must produce answers in time to inform it.
+**Goal: make ADM reversal *stick*.** Reversal itself was solved in 2014. The wet
+lab runs in the same cycle and gets **one shot, no iteration** — this model exists
+to design it, and must produce answers in time to inform it.
 
-Full plan: `docs/ADM_INSILICO_MASTER_PLAN.md`. **Read it before proposing anything.**
+Plan of record: `docs/ADM_MASTER_PLAN_v3.md`. **Read Part 0 first, not last** — it
+explains why the project changed shape. Nothing else is the plan.
 Running log: `docs/PROGRESS.md`. Read the last entry at the start of every session.
-
 Repo: https://github.com/ResearchKhanADM/ADM-Research-ISEF (public)
+
+## The claim
+
+Collins 2014 (PMID 24315826) showed MEK inhibition reverts established PanIN in
+~3 days — and that ADM/PanIN **resumed** when the drug was stopped with KRAS left
+on. "Reverse ADM" is eleven years late. The unoccupied claim is durability:
+**trametinib reverts, it does not stick.** *Rbpjl* has no PTF1A-independent
+promoter, so the loop cannot re-close on its own — that bootstrap failure is why
+reversion is drug-dependent, and it is what the payload is for. Payload
+**identity is not the claim**; it is already published (Jiang 2023, PMID 37425649:
+PTF1A, RBPJL, BHLHA15/MIST1). The claim is **composition, ratio, formulation and
+schedule under a fixed delivery budget.** Three results everything serves:
+
+- **R1 · Formulation** ★ — co-formulated vs separate particles across the plausible
+  uptake-CV range. For an obligate stoichiometric pair, a requirement not a preference.
+- **R2 · Composition** — how many components, at what ratio, under fixed total
+  mRNA mass. A marginal-value curve, not a subset table.
+- **R3 · Durability** — the drug-free persistence window. **This is what the
+  bifurcation diagram is for.** It is the answer, not decoration.
 
 ## Layout
 
@@ -15,115 +35,164 @@ Repo: https://github.com/ResearchKhanADM/ADM-Research-ISEF (public)
 | `src/` | model + analysis code | yes |
 | `scripts/` | runnable entry points (sweeps, downloads) | yes |
 | `prereg/` | parameter ranges + predictions, written *before* runs | yes |
-| `figures/` | board figures | yes |
+| `figures/` | `_style.py`, `_provenance.py`, one module per figure; `out/` holds final PDFs + `_source.csv` + `.prov.json` | yes |
 | `docs/decisions/` | one file per architectural decision | yes |
-| `data/` `results/` `logs/` | datasets, sweep output, checkpoints | **no — gitignored** |
+| `data/` `results/` `logs/` `build/` | datasets, sweep output, working renders | **no — gitignored** |
+
+## Phases — Part 2. Phase 1 runs parallel to Phase 2.
+
+| # | Phase | Wk | Gate / lock |
+|---|---|---|---|
+| 0 | **Decision spec** — cell system, **how many wells actually exist**, assays, viability floor X, durability timepoint, reversal score. Issue Bench Handshake #1. | 1 | Arm budget |
+| 1 | **Candidate generation** — regulon activity across **≥2 independent datasets**, per-dataset frequency. Add an **ADM-repressor axis**. Cross-ref Joung TF Atlas (PMID 36608654) + human TFome (PMID 33257861). | 2 | **GATE A** → Layer 1 lock, **order PTF1A + RBPJL mRNA** |
+| 2 | **Minimal mechanistic core** — 3–4 states, ~9–12 parameters, **nondimensionalized**. | 4 | **GATE B** |
+| 3 | **Delivery layer** ★ **the headline** — per-cell LNP dose as a distribution; correlated vs independent double-above-threshold fraction. | 3 | Formulation + ratio |
+| 4 | **Mixture-amount design** — simplex × total amount, Scheffé polynomial. | 2 | Layer 2 lock: count + mass split |
+| 5 | **Durability + schedule** — time-to-relapse after clearance **with trametinib withdrawn**; dose × redosing map; the two-block ordering question. | 2 | Redosing interval + order |
+| 6 | **Held-out prediction** — KRAS-history effect; viability dissociation. | 2 | **GATE C** |
+| 7 | **Pre-registration + discrimination power** — design to *separate hypotheses*, not to confirm. | 2 | Locked protocol |
+| 8 | **Figures, writeup, buffer** | 3 | — |
+
+**Gates — stop and report. A failed gate is a real result, not a reason to push on.**
+**A** (wk 2) does the pipeline recover PTF1A / RBPJL / BHLHA15? — cheap, fast,
+decisive, and if no the pipeline is broken in month one. **B** (wk 6) two stable
+states plus a saddle, identifiable separatrix, key parameters surviving profile
+likelihood. **C** does the KRAS-history effect fall out of a **single** parameter?
+**Never cut:** 0, 2, 3, 7. **Cut order under compression:** 6 → Phase 4's simplex
+interior (vertices only) → Phase 5's ordering arms.
+
+## The Phase 2 model — 3–4 states, not thirteen
+
+- `P` PTF1A activity, autoregulatory, requiring an E-protein partner
+- `R` RBPJL, produced **only** as a function of `P`. **No P-independent term. That
+  zero *is* the bootstrap claim.**
+- `C` slow chromatin/memory at metaplasia loci — sets time-to-relapse
+- `E_free = E_total − k·ID3`, `ID3 = f(pERK)` — **algebraic, not differential**
+- **pERK is an input, not a state.** Trametinib sets it.
+- Profile likelihood on the three key parameters. **Not** an FIM eigenspectrum —
+  sloppiness was a symptom of over-parameterization that no longer exists.
 
 ## Hard rules
 
-**1. Pre-registration before any sweep or fit.** Write ranges to `prereg/<date>_<name>_ranges.yaml` and the expected outcome to `prereg/<date>_<name>_prediction.md`, then **commit and push**, then run. The value of the held-out prediction depends on proving it was recorded first, and a pushed commit timestamp is that proof. If asked to run a sweep without this, refuse and say why.
+**1. Pre-registration before any sweep or fit.** Ranges to
+`prereg/<date>_<name>_ranges.yaml`, expected outcome to
+`prereg/<date>_<name>_prediction.md`, **commit and push**, then run — the pushed
+timestamp is the proof. **I write the templates; Luqmaan writes the content —
+never fabricate his predictions.** Asked to skip this: refuse and say why.
 
-**2. Nothing large or secret in git.** Datasets run to tens of GB. `scripts/download_data.py` fetches by accession and is idempotent — the script is the artifact. Repo is public: no tokens, no `.env`.
+**2. Nothing large or secret in git.** Datasets run to tens of GB; fetch by accession
+with an idempotent script — the script is the artifact. Public repo: no tokens, no `.env`.
 
-**3. Long jobs run detached, never as a Claude Code background process.** Bash caps near 10 minutes and session-owned background processes are killed on exit. Sweeps must checkpoint to `results/<run_id>/` every N samples, support `--resume`, log to `logs/`, and launch detached. Design checkpointing before the first long run.
+**3. Long jobs run detached, never as a Claude Code background process.** Bash caps
+near 10 min and session-owned processes die on exit. Checkpoint to `results/<run_id>/`
+every N samples, `--resume`, log to `logs/`, launch detached — designed up front.
 
-**4. Architectural decisions get a 2-subagent adversarial panel**, then a writeup in `docs/decisions/NNN-name.md` stating the question, both positions, the decision, and **what would reverse it**. Routine coding choices do not get a panel — just decide.
+**4. Architectural decisions get a 2-subagent adversarial panel**, then
+`docs/decisions/NNN-name.md`: question, both positions, decision, **what would
+reverse it**. Routine coding choices do not get a panel — just decide.
 
-**5. The student must be able to explain every line.** Comment *why*, not *what*. Stop and explain unfamiliar techniques (continuation, Sobol indices, Lie brackets, reach-avoid sets) in chat. Prefer clear over clever. Push back when he's wrong.
+**5. The student must be able to explain every line.** Comment *why*, not *what*.
+Stop and explain unfamiliar techniques (continuation, profile likelihood, Scheffé
+polynomials, compound-Poisson dose, Bliss independence) in chat. Clear over clever.
+**Push back when he's wrong.**
 
-**6. Append to `docs/PROGRESS.md` at the end of every session** — done / broke / next / open questions. Push.
+**6. Append to `docs/PROGRESS.md` every session** — done / broke / next / open
+questions. Push.
 
 ## ⚠ STANDING RULE — never silently drop a failed solve
 
-**Silently dropped failures are the single easiest way for this project to produce a confident wrong answer.**
+**Silently dropped failures are the single easiest way for this project to produce
+a confident wrong answer**, because failures *correlate with swept parameters*.
+Drop them and the surviving sample set is depleted precisely in the regime the
+sweep was built to probe — which looks like a clean negative result. So everywhere
+a solve happens (continuation, root-finding, profile likelihood, Phase 3's Monte
+Carlo): **log every outcome**; **report failure rate as a function of every swept
+parameter, never as a scalar**; **if it correlates with a swept parameter, say so
+in the writeup** and treat results as *conditional on convergence*; and **keep a
+test that sweeps deliberately in the hard regime** asserting a stated bound (<1%).
 
-The mechanism: convergence failures **correlate with swept parameters**. Conditioning worsens as ID3 binding tightens, and tight binding is exactly where T1 and T2 differ. Drop failures and the surviving sample set is depleted *precisely in the discriminating regime* — the Q-value comparison is then biased against the very thing it was built to detect, and the output looks like a clean negative result.
+## ⚠ STANDING RULE — figure modules never compute science
 
-This is not hypothetical. The mandated test caught a **4% failure rate concentrated in the tight regime** on its first run.
+**A figure module loads `results/`, does display arithmetic, and draws. It never
+runs an ODE solve or a sample.** If a figure needs a number not in `results/`, the
+fix is a stage that writes it. Consequence: rebuild is always under a minute,
+figures cannot drift from the analysis, and a slow stage never blocks a figure.
+**Produce figures as you go, every session — not in Phase 8.** One command:
+`python make_figures.py`.
 
-Mandatory, everywhere a numerical solve happens:
+- **General-purpose geometry. No IEEE or conference-template sizing** — one `SCALE`
+  constant in `figures/_style.py`, scaled downstream by Luqmaan.
+- Okabe–Ito, **four nominal colours**: `#0072B2` acinar · `#D55E00` metaplastic ·
+  `#009E73` intervention/success · `#6E6E6E` toxic — **grey, not red** (green/red is
+  the textbook deuteranopia collision).
+- `rc_context`, never a bare rcParams mutation — one process imports every module.
+- `savefig.bbox="standard"`, **not** `"tight"` (tight silently resizes and breaks
+  width checks). `pdf.fonttype 42`, `svg.fonttype "none"`.
+- **Global grammar: a solid line is a model; an open marker with a dark edge is
+  data. Never connect experimental points with a line.**
+- Every stage calls `stamp_run()`; every figure declares inputs and `save_figure()`
+  hashes them. `paper`/`poster` **refuse to render from a dirty tree**.
+  `make_figures.py --check` fails on staleness.
+- **Traps:** no 3-D cusp surface · no hairball of all states · no continuous colormap
+  under a three-class map · no fake error bars on deterministic output · no p-value
+  where there is no sampling · no truncated percentage axis · no bimodality from a
+  KDE shape · two significant figures unless you can defend more.
 
-1. **Log every solve outcome**, converged or not. `binding.ConvergenceLedger` does this; use it or an equivalent.
-2. **Report failure rate as a function of `Kd/E_tot` and of every other swept parameter** — not as a scalar. The ledger keeps the failing conditions for exactly this reason.
-3. **If failure rate correlates with any swept parameter, say so explicitly in the Q-value writeup** and treat the Q-values as *conditional on convergence*.
-4. **Keep a test that sweeps deliberately in the hard regime and asserts the failure rate is below a stated bound.** Current bound: <1%. Current measured: **0/4000 across 12 decades of `Kd/E_tot`**, 0.42 ms/solve.
-5. Note the asymmetry: **T2's first-order sink is closed-form and cannot fail to converge.** If T1 loses samples where T2 cannot, the two Q-values are not comparable until that is reported.
+## Cut — do not re-propose. Reasons in Part 4 and decision 012.
 
-## ⚠ Composable topologies — a topology is a config object, never a source file
+**Five-way topology competition** (its 10× discriminator is not measured — Krah
+2019 has no timepoint between 24 h and 3 weeks; the bound is (1×, 21×)) ·
+**13-state ODE** · **FIM sloppiness analysis** · **Lie-bracket ordering formalism**
+(precedent exists — Letsou & Cai 2016, PMID 27560383 — so the novelty claim was
+false) · **2^k subset enumeration** (the mass budget makes this a mixture problem;
+enumeration visits only simplex vertices) · **submodular/greedy optimization**
+(assumes diminishing returns; the bootstrap threshold claims *super*modularity) ·
+**Pareto front as deliverable** · **Gillespie bimodality vs public scRNA-seq** ·
+**CellOracle as validation** (keep as a *declared negative control*, pre-registered
+to fail) · **Enformer/Borzoi · AlphaFold→k_on · Perturb-seq · one-sided U_crit ·
+structural/Kalman controllability · full-dimension HJ reachability · MPC · all-atom
+MD**. To revisit one, argue it in `docs/decisions/`. Don't just start doing it.
 
-The state list grew to ~13. **Not every state exists in every topology**, and that is what keeps the slow count at 6.
+## Standing limitations — state these before anyone asks
 
-- **CORE** — `P_n`, `R`, `E_tot`, `I`, `M`, `A`, `S`, `W`. Stage 1 continues on this, payload at zero. Reduces to **6 slow (`P_n`, `R`, `E_tot`, `M`, `A`, `S`) + `W` retained**; `I` is the QSS candidate, `P_c`/`E_free`/`C_L`/`C_J` are algebraic.
-- **VARIANT** — `MIST1` in T5 only. `NR5A2` in T6a/T6b only.
+- **The prioritization is a positive control, not a discovery.** Say it on the poster.
+- **A regulon screen is blind to post-translational mechanisms.** TCF3/E47 is not
+  transcriptionally lost — it is titrated — so no threshold surfaces it; it enters
+  by **declared mechanism, registered before the screen runs.**
+- **ID3→E47/PTF1A titration is documented in this cell line; the ERK→ID3 link is
+  the assumption.** Dufresne 2010 (PMID 20830706), *in AR4-2J*: gastrin raises Id3,
+  raises Id3/E47 *and* Id3/Ptf1-p48, lowers E47/Ptf1-p48, and Id3 silencing reverses
+  the mislocalization. **v3 Part 1.4 understates this — see decision 012.**
+  Unmeasured: any **Kd**, and whether **KRAS/ERK** rather than gastrin drives ID3.
+- **PTF1A is pleiotropic** and dosage-sensitive (PMID 30470852). "Preserving
+  viability" does not cover "did not make a neural-program-expressing cell" —
+  **lineage fidelity is a separate endpoint.**
+- **Converted cells often fail to silence the starting program** (CellNet, PMID
+  25126793) — the candidate list is all *turn acinar back on*, hence the
+  ADM-repressor axis.
+- **AR42J needs dexamethasone** to express amylase at a differentiated level at all;
+  baseline PTF1A/RBPJL and dynamic range must be measured or falsification power is
+  unknown.
+- **AR42J Kras genotype is unverified** — azaserine-induced rat tumours are
+  classically Kras-mutant. Week-1 blocking item.
+- **Reference data is mouse/human; the bench is rat, and a transformed line.**
+  Cross-species transfer must be argued, not assumed.
+- **No measured PTF1A half-life, no Hill coefficient, no Kd for any ID3
+  interaction, no prior ODE model of ADM anywhere** — sampled with stated priors,
+  never fitted point values.
 
-**Binding rule: one base right-hand side plus optional terms behind config flags.** Never five copied files — they drift, and an unequal comparison across topologies is not model selection (Ma 2009). Stage 2 swaps topology with one argument; Stage 3 runs sensitivity over whichever states are active; Stage 5 toggles all four interventions independently and swaps `u₃`'s identity. Reasoning: `docs/decisions/003-composable-topology-architecture.md`.
+## Framing — Part 6
 
-## ⚠ Sequestration is ONE equilibrium with TWO targets
-
-ID3 traps **both** E47 and PTF1A (Dufresne 2010, PMID 20830706, in AR4-2J). `P_n` is **free** nuclear PTF1A; `P_c`, `E_free`, `C_L`, `C_J` are derived from the shared binding polynomial, never integrated.
-
-The first-order sink `−k_seq·I·P_n` is **deleted and must not return** — but note *why*: sequestration did not disappear, it moved into the equilibrium. Deleting it outright is the opposite error. Full algebra with every step: `docs/derivations/binding_polynomial.md`. This term decides whether the model can be bistable at all.
-
-## ⚠ Viability is a U-shaped hazard, never a threshold
-
-`h(S,P_n)` rises at both ends — high `S` (cargo outruns capacity) and low `P_n` (CHOP-dependent apoptosis). `survival = exp(−∫h dt)`. **"Death when `S` exceeds tolerance" is deleted** — it was `U_crit` in new clothing. The hazard integrates along the trajectory, so a brief excursion costs survival without automatically killing, and it yields the continuous 0–1 number the headline figure's y-axis needs.
-
-## ⚠ `W` IS PROTECTED FROM ELIMINATION
-
-The model has **11 states**, not 10. `W` (phospho-MEK pool) is **fast by turnover — minutes — and must NOT be eliminated in the Stage 0 fast-variable sweep.**
-
-QSS on `W` substitutes it straight back into `K_eff` and recovers the static product `K_eff = K·f_act·f_cat`, which provably cannot produce the §1.2 withdrawal-asymmetry prediction: at matched pERK both drugs give identical `K_eff`, so all states evolve identically and withdrawal is identical. **Eliminating `W` is not an approximation of this model — it is a different model making a different prediction.**
-
-Two things that must not drift:
-- **`RAF_drive` is strictly DECREASING in `K_eff`.** Falling ERK relieves negative feedback on RAF, so drive rises as ERK falls. An increasing implementation inverts the mechanism, predicts the opposite, and still runs clean. Asserted in code, covered by a unit test.
-- **`τ_W` is sampled across minutes–hours**, never fixed. It sets the impulse `∫ΔK_eff dt`, which decides whether the separatrix is crossed.
-
-The §1.2 prediction is **conditional**: asymmetry occurs iff the transient overshoot suffices to cross the separatrix. Report the ensemble fraction. 5% is a result; say 5%.
-
-This is the one deliberate fast-variable retention in the model. It will read as an inconsistency to anyone who does not find the justification, so it must be argued in the writeup. Reasoning: `docs/decisions/002-w-state-protected-from-elimination.md`.
-
-## What the mechanistic model may and may not claim
-
-The payload species **are** state variables, so the ODE cannot derive payload *identity* without circularity. It is never asked "which molecules." It is asked:
-
-- **necessity** — all 16 subsets of {trametinib, u₁, u₂, u₃} across the ensemble; which components are required, which are redundant. Compare at matched **total** dose as well as matched per-component dose, or the result is just "more protein is better." "Three mRNAs is over-engineering" is a valid finding.
-- **dose, schedule, order** — Stages 5 and 6.
-- **whether the reversal-optimal and viability-optimal payloads are the same payload** — a Pareto question. If they differ, that is a headline result and it is the stated objective.
-
-Identity comes from the other arm, Stage 3B. Reasoning in `docs/decisions/001-two-arm-payload-derivation.md`.
-
-## Already ruled out — do not re-propose
-
-Killed by expert panel with reasons in the master plan: AlphaFold/Boltz → binding rate constants · Enformer/Borzoi (no rat support, wrong output class) · Perturb-seq vector arithmetic for cocktail derivation · fast histone acetylation as a standalone state · one-sided toxicity ceiling · structural/Kalman controllability · full-dimension Hamilton–Jacobi reachability, MPC, all-atom MD.
-
-**Perturb-seq ≠ Stage 3B.** Perturb-seq was killed on *cell context* — K562/RPE1 do not express RBPJL, so the libraries could not contain it. That objection is about the data source and does not transfer to CellOracle on a pancreatic dataset, which has the factors present and uses a different method. Stage 3B carries its own separate limitations; they are listed in the master plan.
-
-To revisit one, argue it in `docs/decisions/` against the plan. Don't just start doing it.
-
-## Stage order — sequential, each depends on the last
-
-0. **Reduce and certify** — nondimensionalize, eliminate fast variables to 5–6 slow states, classify all fixed points, locate the separatrix. *Never skip.*
-1. **Two-parameter bifurcation** — KRAS dose × trametinib dose.
-2. **Topology competition** — 5 architectures, one sampling box, compare Q-values. **GATE: does any topology reproduce the 3-day (MEKi) vs 3-week (forced PTF1A) asymmetry?**
-3. **Identifiability + third-mRNA selection** — FIM eigenspectrum; rank E47/TCF3 vs NR5A2 vs MIST1.
-3B. **In-silico perturbation screen** — CellOracle (PMID 36755098) on GSE207938; overexpress across the full TF repertoire, rank by ADM→acinar shift. **Pre-registration is non-negotiable here**, including predicted ranks for PTF1A/RBPJL/NR5A2. Whatever it returns gets reported, including a low rank for those three. Pre-flight: confirm RBPJL has outgoing edges in the base GRN, or its score is meaningless rather than negative.
-4. **Held-out prediction** — **GATE: does the KRAS-history effect fall out of one parameter?**
-5. **Dosing schedule** — (dose per mRNA pulse) × (redosing interval), three-region classification.
-6. **Ordering** — Lie bracket, then isodose phase sweep.
-7. **Single-cell falsification** — Gillespie vs GSE314765 / GSE207938 / GSE172380 / GSE141017.
-
-**Stop at each gate and report before continuing.** A failed gate is a real result, not a reason to push on.
+Category **CBIO**. **Frame the wet lab as computation-that-designed-an-experiment,
+never as validation** — if it comes back negative and you claimed validation, your
+conclusion is deleted. Dated prediction box **left of** the outcome box;
+pre-specified interpretation table; **effect size and pre-registered direction,
+never a p-value**. Bound what it can falsify: ordering and timing yes, dose no.
 
 ## Environment
 
-```
-venv\Scripts\activate                  # Windows
-pip install -r requirements.txt
-```
-Core stack: `numpy scipy matplotlib pandas sympy casadi SALib h5py anndata scanpy`.
-Continuation is hand-rolled pseudo-arclength on the *reduced* system (~200 lines). Do not adopt PyDSTool (unmaintained, poor on Windows) or AUTO-07p (Fortran build) without a decision writeup — continuation on the full-dimension system is the single biggest schedule risk in the project.
-
-## Standing unknowns
-
-- **AR42J Kras genotype is unverified.** The line came from an azaserine-induced rat tumour and those are classically Kras-mutant. If it is already mutant, "KRAS-induced ADM" changes to "KRAS dose titration on a mutant background" and the forcing term changes. Highest-priority open question.
-- No measured PTF1A half-life, no measured Hill coefficient, no Kd for any ID3 interaction, no prior ODE model of ADM anywhere. Treat these as sampled parameters with stated priors, never as fitted point values.
+`venv\Scripts\activate` then `pip install -r requirements.txt`. Stack:
+`numpy scipy matplotlib pandas sympy casadi SALib h5py anndata scanpy`.
+Continuation is hand-rolled pseudo-arclength on a 3–4 state system — far smaller
+than the old plan's, so the schedule risk that motivated the reduction is largely
+gone. Do not adopt PyDSTool or AUTO-07p without a decision writeup.

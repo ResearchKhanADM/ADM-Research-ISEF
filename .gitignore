@@ -2,6 +2,8 @@
 data/
 results/
 logs/
+# working figure renders and proofs. figures/out/ IS tracked; build/ is not.
+build/
 *.h5ad
 *.h5
 *.pkl

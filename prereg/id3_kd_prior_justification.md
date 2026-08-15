@@ -1,7 +1,27 @@
 # Prior justification — ID3 dissociation constants `K_IE` and `K_IP`
 
-*Written 2026-08-15, before any sweep. To be incorporated verbatim into the
-Stage 2 pre-registration.*
+> ## ⚠ ITS DESTINATION IS GONE; ITS CONTENT IS NOT
+>
+> This was written for the **Stage 2 topology competition**, which is cut
+> (decision 012 — its discriminator is unmeasured). There is no Q-value
+> comparison to pre-register, so nothing below should be read as a live sweep
+> plan, and the T1/T2 framing is dead.
+>
+> **The physics survives and matters to Phase 3.** `K_d/E_tot` sets how *sharp*
+> the P–R bootstrap threshold is, and v3 Phase 3 convolves the per-cell LNP dose
+> distribution against exactly that threshold to get converted fraction. A soft
+> threshold and an ultrasensitive one give different co-formulation gaps — the
+> headline number. Re-read §"What is sampled" and the two evidence strands when
+> Phase 3 sets threshold sharpness.
+>
+> **One correction, made 2026-08-15 after re-checking PubMed:** v3 Part 1.4 calls
+> the ID3→E47 titration node undocumented in pancreatic ADM. Dufresne 2010 (PMID
+> 20830706) documents it *in AR4-2J*. What is undocumented is any **Kd** — which
+> is what this file already says — and whether **KRAS/ERK** rather than gastrin
+> drives ID3. See decision 012.
+
+*Written 2026-08-15, before any sweep. Written for the Stage 2 pre-registration,
+which no longer exists.*
 
 **This document justifies the WIDTH and WEIGHTING of a prior. It does not pick a
 value, and no sweep may fix one.**

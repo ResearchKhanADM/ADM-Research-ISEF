@@ -244,3 +244,118 @@ the pulse shape belongs to Stage 6's simulation arm.
    system needs the titrator as a state — and flagged it as the leading QSS
    candidate, which is how the slow count still reaches 6. Flagging in case the
    omission was deliberate.
+
+---
+
+## 2026-08-15 · Session 3 — architecture change absorbed; documents and cleanup only
+
+No science code, no modelling, by instruction. The model rewrite is next session.
+
+### 🚨 BLOCKING — Week-1 bench items. Phase 3 cannot run without these.
+
+**These are blocking, not "nice to have", and they have long lead times.** Phase 3
+is the headline result and every one of its axes has units the bench must supply;
+Phase 5's dose × interval map is unplottable without PK. Issue **Bench Handshake
+#1 now** (v3 Phase 0), in week 1, not when Phase 3 starts.
+
+| # | Item | Blocks | Why it cannot be assumed |
+|---|---|---|---|
+| 1 | **AR42J *Kras* genotype** — sequence codons 12/13 and 61 | the entire forcing term | Azaserine-induced rat tumours are classically Kras-mutant. If the stock is already mutant, "KRAS-induced ADM" becomes "KRAS dose titration on a mutant background" and the input changes shape. **Highest-stakes unknown in the project, unchanged since session 1.** |
+| 2 | **Trametinib IC50 *in these cells*** | Phase 2's drug axis; Phase 5 | A published IC50 from another line sets the wrong axis origin, and every dose recommendation inherits the error invisibly. |
+| 3 | **LNP transfection efficiency AND its cell-to-cell CV** | **Phase 3 ★, directly** | The CV *is* the x-axis of the headline figure. Efficiency alone is not enough — the whole co-formulation result is a statement about the *spread*, so a mean without a CV cannot produce it. |
+| 4 | **mRNA half-life in AR42J / Matrigel** | Phase 5's redosing interval | The interval axis has no units without it. Matrigel-specific: 3D culture is not 2D and a plastic-dish number is a different number. |
+| 5 | **Baseline PTF1A / RBPJL by qPCR, ± dexamethasone** | Phase 2 initial conditions; Gate A interpretation | AR42J needs dex to express amylase at a differentiated level at all. Without baseline and achievable dynamic range, **the experiment's falsification power is unknown** — a null could mean "payload failed" or "there was no room to move". |
+| 6 | **ADM stability to ≥14–21 days** | Phase 5's durability endpoint | If the ADM state does not hold that long unassisted, "durable reversal" has no measurable contrast. |
+
+Item **3** is the one to chase hardest: it is the only input to the project's
+strongest result, and it is the one no literature value can substitute for.
+
+### Done
+
+- **Read `ADM_MASTER_PLAN_v3.md` end to end** and audited it against the repo.
+  Conflicts reported to Luqmaan before anything was touched; the material ones are
+  recorded in decision 012 rather than left in chat.
+- **Deleted the superseded plans**, from the repo and from the Claude outputs
+  folder on this machine: `docs/ADM_INSILICO_MASTER_PLAN.md`,
+  `INSILICO_PLAN_v2.md`, `INSILICO_PLAN_8months.md`. Git history preserves them.
+  This closes session 1's open question 2 — they had been read by mistake once and
+  nearly built from.
+  *(The two AppData paths that appeared to hold separate copies —
+  `Roaming\Claude\...` and `Local\Packages\Claude_pzs8sxrjxfjjc\LocalCache\Roaming\Claude\...`
+  — are the **same directory** behind the packaged-app VFS redirect. Verified with
+  a probe file rather than assumed, so one delete genuinely covered both.)*
+- **v3 copied into `docs/ADM_MASTER_PLAN_v3.md`** as the single plan of record,
+  hash-verified identical before anything was deleted.
+- **`CLAUDE.md` rewritten** against v3 — eight phases, three gates, the cut list,
+  the standing limitations, and the Part 5 figure rule. 198 lines.
+- **`CLAUDE_CODE_KICKOFF_PROMPT.md` fixed** (it lives in the outputs folder, not
+  the repo): banner saying it is historical, the seven-stage work order replaced
+  by the eight-phase table, and the one-line "how to start a session now".
+  Also banner-marked the **stale `CLAUDE.md` copy** sitting in the same folder —
+  it named the old GitHub URL and the deleted plan.
+- **Decision 012 written** — the architecture change, what it supersedes, and what
+  would reverse it.
+- **`README.md` rewritten** — it pointed at the deleted plan and described five
+  candidate architectures.
+- **Superseded banners** on `docs/STAGE0_PLAN_GAPS.md` (every `§` in it points
+  into a deleted file) and `prereg/id3_kd_prior_justification.md` (its Stage 2
+  destination is gone, but its physics feeds Phase 3).
+- **Figure infrastructure built** per v3 Part 5, and **verified end to end**:
+  `figures/_style.py` (one `SCALE`, four Okabe–Ito roles, model-vs-data grammar,
+  `savefig.bbox="standard"`), `figures/_provenance.py` (`stamp_run`,
+  `save_figure`, `is_stale`), `make_figures.py`, `figures/README.md`, `build/`
+  gitignored. Confirmed by running: `--selftest` renders a proof sheet with a real
+  `.prov.json` and `_source.csv`; `profile="paper"` **refuses a dirty tree**;
+  `is_stale` correctly reports a never-rendered figure. No figure modules yet —
+  there are no `results/` to draw from, and a figure module that computes its own
+  numbers is the one thing the architecture forbids.
+
+### Broke
+
+- Nothing broke. One thing was **found wrong, in v3 itself** — see open question 1.
+- Worth recording as a near-miss rather than a break: the plan-of-record file and
+  three superseded drafts were all sitting in the same folder, and the folder is
+  reachable by any session. That is how the wrong plan got read the first time.
+
+### Next — the model rewrite
+
+- **Phase 2 core: 3–4 states, ~9–12 parameters, nondimensionalized.** `P`, `R`,
+  `C`, with `E_free = E_total − k·ID3` and `ID3 = f(pERK)` algebraic, and **pERK an
+  input, not a state.**
+- Before writing it, decide what happens to `src/` (audit is in this session's
+  report — nothing has been moved or deleted). `binding.py` and the derivation
+  should be **kept as supplementary**, not deleted: they quantify how *sharp* the
+  bootstrap threshold is, and Phase 3 convolves the LNP dose distribution against
+  exactly that threshold.
+- Profile likelihood on three parameters. **Not** an FIM eigenspectrum.
+- Produce figures as the stages produce results, not in Phase 8.
+
+### Open questions — need Luqmaan
+
+1. **v3 Part 1.4 is wrong about the ID3→E47 titration node, and it should not go
+   on a poster as written.** It says targeted search returned no evidence in the
+   pancreatic context. **Dufresne 2010 (PMID 20830706) is exactly that evidence,
+   in AR4-2J — the bench line.** Verified against PubMed this session: gastrin
+   raises Id3, raises Id3/E47 **and** Id3/Ptf1-p48, lowers E47/Ptf1-p48; Id3
+   silencing reverses the mislocalization; Id3 is overexpressed with Ptf1-p48
+   mislocalized in human and murine preneoplastic lesions. What *is* undocumented
+   is narrower and should be stated in that narrower form: **no Kd**, and the
+   driver in Dufresne is **gastrin, not KRAS/ERK — the ERK→ID3 edge is the
+   assumption.** This makes Phase 5's ordering prediction better supported than v3
+   claims. **Confirm you want v3 Part 1.4 amended**; I have not edited the plan.
+2. **`W` and the trametinib-vs-PD325901 withdrawal asymmetry are being dropped by
+   architecture, not by evidence.** Decision 002's own reversal condition — a
+   Stage 1 finding that the attractor sits too far from the separatrix — was never
+   tested. v3 makes pERK an input, which leaves nowhere for `W` to live. Confirm
+   the prediction is **set aside for schedule reasons, not refuted**; that is how
+   decision 012 records it.
+3. **Does viability stay modelled, or become a bench measurement plus a floor?**
+   v3 keeps a viability floor X (Phase 0) and the therapeutic index (Phase 7) but
+   **never mentions the U-shaped hazard** — neither keeping nor cutting it. At 3–4
+   states there is no `S` (secretory cargo) state, so the hazard's high-`S` arm has
+   nothing to attach to. Decision 008 is therefore in limbo. **Needs a call at
+   Phase 0**, because it defines an endpoint.
+4. **What is the arm budget?** v3 Phase 0's first question is *how many
+   experimental wells actually exist*. Everything in Phases 4, 5 and 7 is a
+   function of that number, and the previous plan's mistake was optimizing before
+   knowing it.

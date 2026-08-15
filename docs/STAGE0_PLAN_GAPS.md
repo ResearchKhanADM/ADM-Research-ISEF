@@ -1,5 +1,17 @@
 # Stage 0 · complete gap audit of master plan §3.1 and §3.2
 
+> ## ⚠ SUPERSEDED — HISTORICAL RECORD ONLY
+>
+> Every `§` reference below points into `docs/ADM_INSILICO_MASTER_PLAN.md`, which
+> **has been deleted** (superseded by `docs/ADM_MASTER_PLAN_v3.md`; see decision
+> 012). The eleven-state system this audit resolves is cut. **Do not build from
+> this file.**
+>
+> Kept because it is the record of how decisions 001–011 were reached, and
+> because gaps B3 (total vs free E-protein), B6 (viability is not a one-sided
+> threshold) and B7 (inputs are pulses with a shape) are *reasoning* that still
+> applies to the v3 core even though the equations around them changed.
+
 *Date:* 2026-08-15
 *Purpose:* one exhaustive pass, so all plan changes can be absorbed at once
 rather than one per session.
