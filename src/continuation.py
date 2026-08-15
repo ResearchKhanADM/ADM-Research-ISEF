@@ -116,18 +116,46 @@ class ContinuationError(RuntimeError):
 
 
 def jacobian_x(f, x, p, eps=1e-7):
-    """df/dx by central differences.
+    """df/dx by central differences, with a guard against the state clamp.
 
     Central rather than forward: forward differences carry O(h) error, and the
     fold test reads the SIGN of an eigenvalue crossing zero. An O(h) bias near a
     zero eigenvalue moves the detected fold location, which is the number being
     reported.
+
+    **THE CLAMP TRAP — this cost a factor of exactly 2 and was invisible.**
+    `core.rhs` clamps states with `max(y, 0)`. On the metaplastic branch `R*`
+    falls far below a fixed step (2e-7 at ERK 1.6; 6e-11 at ERK 5.0), so the
+    `x - h` evaluation lands in the clamped region, the perturbation is only
+    half-applied, and the central difference returns **exactly half the true
+    slope**. Measured at ERK 5.0: `J[1,1] = -0.5003` against a true `-rho = -1.0`.
+
+    Stability *labels* survived — the sign stays negative, so Gate B's structural
+    result is unaffected — but every eigenvalue, relaxation rate and timescale
+    read off that branch was wrong by 2x. Exactly the class of bug this project
+    keeps finding: it runs clean and it renders.
+
+    Fix: shrink the step so `x_i - h` cannot cross zero, and fall back to a
+    one-sided difference when the coordinate is already at the boundary.
     """
     x = np.asarray(x, float)
     n = x.size
     J = np.empty((n, n))
+    f0 = None
     for i in range(n):
         h = eps * max(1.0, abs(x[i]))
+        # Never step across the clamp: if x_i is closer to 0 than h, the
+        # symmetric difference is silently one-sided and half-scaled.
+        if x[i] - h < 0.0:
+            if x[i] <= 0.0:
+                # At the boundary: forward difference is the only honest option.
+                if f0 is None:
+                    f0 = f(x, p)
+                xp = x.copy()
+                xp[i] += h
+                J[:, i] = (f(xp, p) - f0) / h
+                continue
+            h = 0.5 * x[i]          # largest symmetric step that stays inside
         xp, xm = x.copy(), x.copy()
         xp[i] += h
         xm[i] -= h

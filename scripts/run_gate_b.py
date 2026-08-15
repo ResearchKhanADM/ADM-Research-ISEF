@@ -159,7 +159,23 @@ def separatrix(p, x_saddle, erk, n_rays=48, radius=1e-4, t_back=400.0,
                          "message": str(s.message)})
         if s.success and s.y.shape[1] > 1:
             rays.append(s.y.T)
-    return rays, outcomes, (v1, v2), ev
+
+    # COVERAGE, not just termination. "48/48 rays terminated" says nothing about
+    # whether they SPAN the manifold. In backward time the fast stable direction
+    # expands ~165x faster than the slow one, so a uniform seed circle is
+    # stretched into a sliver and the rays collapse onto the two branches of the
+    # IN-PLANE 1-D stable manifold. Measured here as the largest angular gap
+    # between adjacent ray endpoints, projected back onto the eigenplane: uniform
+    # coverage would give 360/n_rays.
+    gaps = None
+    if rays:
+        ang = []
+        for r in rays:
+            d = r[-1] - x_saddle
+            ang.append(np.arctan2(d @ v2, d @ v1))
+        a = np.sort(np.asarray(ang))
+        gaps = float(np.max(np.diff(np.concatenate([a, [a[0] + 2 * np.pi]]))))
+    return rays, outcomes, (v1, v2), ev, gaps
 
 
 def main() -> int:
@@ -188,7 +204,7 @@ def main() -> int:
     print(f"  stability classes: {counts}")
 
     # --- the separatrix, at the midpoint of the bistable window
-    sep_rays, sep_outcomes, basis, sep_ev = [], [], None, None
+    sep_rays, sep_outcomes, basis, sep_ev, sep_gap = [], [], None, None, None
     erk_mid = None
     if len(fold_erk) == 2:
         erk_mid = 0.5 * (fold_erk[0] + fold_erk[1])
@@ -202,12 +218,15 @@ def main() -> int:
             box = 2.0 * np.max(np.abs(X), axis=0)
             print(f"growing separatrix from the saddle at ERK={P[i]:.4f} "
                   f"(domain box {np.round(box, 3)}) ...")
-            sep_rays, sep_outcomes, basis, sep_ev = separatrix(
+            sep_rays, sep_outcomes, basis, sep_ev, sep_gap = separatrix(
                 p, X[i], P[i], domain=box)
             n_ok = sum(o["ok"] for o in sep_outcomes)
             n_left = sum(o["left_domain"] for o in sep_outcomes)
             print(f"  {n_ok}/{len(sep_outcomes)} rays integrated, "
                   f"{n_left} reached the domain edge")
+            print(f"  angular coverage: largest gap {np.degrees(sep_gap):.1f} deg "
+                  f"(uniform would be {360/len(sep_outcomes):.1f}) -> "
+                  f"{'COLLAPSED onto the in-plane manifold' if np.degrees(sep_gap) > 45 else 'spread'}")
         else:
             print("  !! no saddle found near the window midpoint")
 
@@ -255,6 +274,17 @@ def main() -> int:
         "saddle_stable_manifold_dim": 2,
         "separatrix_rays": len(sep_rays),
         "separatrix_erk": erk_mid,
+        "separatrix_max_angular_gap_deg": (float(np.degrees(sep_gap))
+                                           if sep_gap is not None else None),
+        "separatrix_WHAT_IS_ACTUALLY_COMPUTED": (
+            "The IN-PLANE separatrix at C = C*: the 1-D stable manifold of the "
+            "saddle within the invariant plane {C = C*}. NOT the full 2-D W^s. "
+            "C is decoupled from (P,R) — the dC row of the Jacobian is (0,0,.) — "
+            "so {C = C*} is invariant, and in backward time the fast stable "
+            "direction expands ~165x faster than the slow one, collapsing a "
+            "uniform seed circle onto the in-plane branches. The angular gap "
+            "above measures that collapse; a large gap means coverage of the "
+            "2-D manifold was NOT achieved and must not be claimed."),
         "gate_b_structure_met": bool(len(fold_erk) == 2 and "saddle" in counts
                                      and len(sep_rays) > 0),
     }

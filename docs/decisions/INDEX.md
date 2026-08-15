@@ -27,6 +27,17 @@ amendment at the top · **retired** = the claim is withdrawn, not paused ·
 | 014 | `C` is a strict cascade | `dC/dτ` sees neither the states nor the payload, so the payload has no channel to durability. | **moot** — the cascade is real, but relapse is not chromatin-limited (015) |
 | 015 | Relapse is not chromatin-limited | Measured three ways; **R3 becomes a threshold claim** in post-withdrawal drive, flat in dose and in drug-hold. | **live** — conditional on `ε < 1.54`; see its headline caveat |
 
+## Live issues carried into the next session
+
+- **R2 may not be answerable by this model.** Measured: every PTF1A:RBPJL mass
+  split from 2% to 98% lands within 1% of the maximum, and the final attractor is
+  identical to 4 dp at every total mass. The model decides *whether* the threshold
+  is crossed; the attractor is then the same. **Needs a decision — and under the
+  integrity fork the answer is to restate R2, not to add a mechanism that
+  manufactures a ratio.**
+- **`results/fold_loci/` was computed with a buggy Jacobian.** Rerun launched;
+  quote nothing from it until `logs/fold_loci_rerun.log` is checked.
+
 ## Standing reversal conditions worth knowing without opening a file
 
 - **015 inverts if `ε > 1.5396`** — a bistable `C` could hold its own state after

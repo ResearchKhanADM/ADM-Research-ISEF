@@ -193,3 +193,50 @@ def test_hard_regime_failure_rate_is_bounded():
         f"corrector failure rate {led.failure_rate:.2%} across the cusp including "
         f"both folds; {led.summary()}"
     )
+
+
+def test_jacobian_is_not_halved_by_the_state_clamp():
+    """Regression: the clamp trap that returned exactly half the true slope.
+
+    `core.rhs` clamps states with `max(y, 0)`. On the metaplastic branch `R*`
+    falls far below a fixed finite-difference step (6e-11 at ERK 5.0), so the
+    `x - h` evaluation landed in the clamped region, the perturbation was only
+    half-applied, and the central difference returned **exactly half** the true
+    slope — `J[1,1] = -0.5003` against a true `-rho = -1.0`.
+
+    Stability *labels* survived, because the sign stayed negative, so Gate B's
+    structural result was never wrong. Every eigenvalue and timescale quoted off
+    that branch was wrong by 2x. It ran clean and it rendered — the class of bug
+    this project keeps finding.
+    """
+    from scipy.integrate import solve_ivp
+
+    from src import core
+
+    p = core.default_params()
+
+    def f(x, erk):
+        return core.rhs(0.0, np.asarray(x, float), p,
+                        core.Inputs.constant(erk=float(erk)))
+
+    for erk in (1.6, 3.0, 5.0):
+        s = solve_ivp(core.rhs, (0, 20_000), [0.0, 0.0, 3.0],
+                      args=(p, core.Inputs.constant(erk=erk)),
+                      method="LSODA", rtol=1e-12, atol=1e-14)
+        assert s.success
+        J = cont.jacobian_x(f, s.y[:, -1], erk)
+        # dR/dtau = rho*(a_R*hill(...) - R), so d/dR = -rho exactly.
+        assert J[1, 1] == pytest.approx(-p.rho, rel=1e-4), (
+            f"J[1,1] = {J[1,1]:.6f} at ERK={erk} with R* = {s.y[1, -1]:.2e}; "
+            f"expected {-p.rho}. A value near {-p.rho / 2} means the clamp is "
+            f"halving the finite difference again.")
+
+
+def test_jacobian_handles_a_coordinate_exactly_at_the_boundary():
+    """At `x_i = 0` a symmetric step is impossible; forward must be used."""
+    def g(x, p):
+        return np.array([-2.0 * x[0] + p, -3.0 * x[1]])
+
+    J = cont.jacobian_x(g, np.array([0.0, 1.0]), 0.0)
+    assert J[0, 0] == pytest.approx(-2.0, rel=1e-5)
+    assert J[1, 1] == pytest.approx(-3.0, rel=1e-5)

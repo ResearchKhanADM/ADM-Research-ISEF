@@ -743,3 +743,90 @@ freezing it prevents relapse entirely. **It is a boundary layer, not the clock.*
 
 None new. Outstanding and Luqmaan's: the Sobol predictions (blocking that sweep),
 and the arm budget (blocking Phase 4).
+
+---
+
+## 2026-08-15 · Session 8 — panels close; a live Jacobian bug; R2 may not be answerable
+
+**HANDOFF SESSION. Context is deep — full state below, then start fresh.**
+
+### ⚠ CHANGED A PREVIOUSLY REPORTED NUMBER — the persistence window moved
+
+**Lower fold 0.0588 → 0.1401. Window width 0.6535 → 0.5778.** Cause: a live
+finite-difference bug, below. The corrected values match an **independent
+reference** (methods panel, exact scalar reduction) to **6–7 digits**:
+
+  reported now  [0.1400694, 0.7178551]
+  independent   [0.1400688, 0.7178550]      agreement 6e-7, 1e-7
+
+`results/gate_b/` regenerated; `fig02` rebuilt. **`results/fold_loci/` was
+computed with the buggy Jacobian — rerun launched detached to
+`logs/fold_loci_rerun.log`; check it before quoting anything from it.**
+
+### The bug — `jacobian_x` returned exactly half the true slope
+
+`core.rhs` clamps states with `max(y, 0)`. On the metaplastic branch `R*` falls
+far below the fixed FD step (2e-7 at ERK 1.6, **6e-11 at ERK 5.0**), so the
+`x − h` evaluation landed in the clamped region, the perturbation was only
+half-applied, and the central difference returned **exactly half**:
+`J[1,1] = −0.5003` against a true `−ρ = −1.0`.
+
+**Stability labels survived** — the sign stayed negative — so Gate B's structural
+result was never wrong. But every eigenvalue, relaxation rate and timescale off
+that branch was wrong by 2×, and it ran clean and rendered. Fixed (step shrinks
+so it cannot cross zero; one-sided at the boundary), verified `J[1,1] = −1.000000`
+at ERK 1.6/3.0/5.0, two regression tests added.
+
+### The separatrix was mislabelled — corrected
+
+`C` is **decoupled** from `(P,R)` (the `dC` Jacobian row is exactly `(0,0,·)`), so
+`{C = C*}` is an invariant plane and the fast stable direction expands ~165× faster
+than the slow one in backward time. The 48-ray seed circle therefore **collapses**:
+measured largest angular gap **185°** against 7.5° for uniform coverage.
+
+**What is computed is the IN-PLANE separatrix at `C = C*` — a 1-D stable manifold
+inside the invariant plane, not the full 2-D `W^s`.** Renamed in the output, and a
+coverage diagnostic now ships alongside the termination count. *"48/48 rays
+terminated" was a termination statistic being read as a coverage statistic.*
+
+### Two panel claims checked — one confirmed, one refuted
+
+**REFUTED · R1 cannot change sign.** A panellist claimed co-formulation becomes
+*worse* than separate particles above a dose threshold. It does not, and it cannot:
+for the double-above-threshold criterion, perfect correlation gives `p` and
+independence gives `p²`, and `p ≥ p²` always. Checked across CV 0.5/1/2 and
+mean/threshold 0.4→3.0 — **the gap is positive everywhere** (+0.014 to +0.250).
+The panellist was computing a different quantity. **R1's direction is safe.**
+
+**CONFIRMED · R2 may not be answerable by this model.** Scanning the PTF1A:RBPJL
+mass split from f=0.02 to f=0.98 at totals 2, 10 and 40: **100% of splits land
+within 1% of the maximum, and the final attractor is identical to 4 decimal
+places (R = 3.9801) at every split and every total.** The model decides *whether
+the threshold is crossed*; after that the attractor is the same. **R2 as "what
+ratio" has no answer here** — this needs a decision next session, and under the
+standing integrity-fork rule the answer is to restate R2, not to add a mechanism
+that manufactures a ratio.
+
+### Free strengthening, not yet claimed
+
+The `C`-decoupling makes decision 015's finding a **theorem**, not a sweep result:
+`C` is a one-way input to `(P,R)` with no feedback, so freezing it cannot change
+where `(P,R)` goes. Also: the `(P,R)` block is **cooperative** (both off-diagonals
+≥ 0) ⇒ real spectrum always ⇒ **no Hopf, no limit cycle**, so "two sinks plus one
+saddle" is the *only* bistable structure available. Much stronger than "we looked
+and found two." And equilibria reduce to a **scalar root-find in `P`** — an
+independent cross-check that the continuation missed no branch.
+
+### Next session — in order
+
+1. `logs/fold_loci_rerun.log` — confirm it finished, requote nothing until then.
+2. **Decide R2** (integrity fork: restate, do not manufacture). Write the decision.
+3. Run the Sobol sweep — **prereg is pushed, so it is unblocked**. Stratified over
+   `(n_P, n_R)`, horizon `t_end = max(4000, 40/γ)`. **If P2 fires (`γ` with
+   S1 > 0.15 anywhere), STOP and report — bug hypothesis first.**
+4. Fold the three "free strengthening" items above into the Gate B writeup.
+5. `fig01_loop_schematic`.
+
+### Open questions
+
+None new for Luqmaan. Outstanding and his: the arm budget (blocks Phase 4).
