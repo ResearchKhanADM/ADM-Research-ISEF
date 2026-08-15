@@ -46,6 +46,17 @@ scanpy 1.12.3 · pyyaml 6.0.3
   - `verify_env.py` first reported SALib as version "unknown" and raised
     FutureWarnings from anndata/scanpy, because it read `module.__version__`.
     Rewritten to use `importlib.metadata`. Fixed, not suppressed.
+- **The push did not complete.** `git push` failed with
+  `fatal: User cancelled dialog` → `could not read Username for
+  'https://github.com'`. The credential helper is Git Credential Manager, which
+  needs to open an interactive auth window, and the session running this had no
+  TTY. **Nothing is wrong with the repo** — the commit is intact and `main` is
+  simply ahead of `origin/main` by one. It needs one interactive
+  `git push -u origin main` from a normal terminal; GCM then caches the
+  credential and later sessions push without prompting.
+  This matters beyond convenience: **pre-registration is enforced by a pushed
+  commit timestamp**, so pushing must be known to work before the first sweep,
+  not discovered to be broken at that moment.
 
 ### Next
 
